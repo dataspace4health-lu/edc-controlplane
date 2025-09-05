@@ -32,7 +32,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
 # Copy only the fat jar and configs from builder
+COPY --from=builder /workspace/build/libs/*.jar /app/controlplane.jar
 COPY --from=builder /workspace/config.properties /app/config.properties
 
 # Run the jar with config + logging
-CMD ["java", "-Dedc.fs.config=/app/config.properties", "-Dorg.slf4j.simpleLogger.defaultLogLevel=debug", "-jar", "/app/connector.jar"]
+CMD ["java", "-Dedc.fs.config=/app/config.properties", "-Dorg.slf4j.simpleLogger.defaultLogLevel=debug", "-jar", "/app/controlplane.jar"]
