@@ -27,20 +27,19 @@ dependencies {
     implementation(libs.edc.control.plane.core)
 
     // Data plane (HTTP)
-    implementation(libs.edc.data.plane.core)
-    implementation(libs.edc.data.plane.http)
-    implementation(libs.edc.data.plane.signaling.api)
     implementation(libs.edc.data.plane.signaling.client)
     implementation(libs.edc.data.plane.selector.api)
     implementation(libs.edc.data.plane.selector.core)
+    implementation(libs.edc.data.plane.selector.control.api)
     implementation(libs.edc.control.plane.api.client)
+    implementation(libs.edc.control.api.configuration)
+    
 
     // Missing dependencies for injection
     implementation(libs.edc.iam.mock)
     implementation(libs.edc.edr.store.core)
     implementation(libs.edc.configuration.filesystem)
     implementation(libs.edc.dsp)
-    implementation(libs.edc.control.api.configuration)
 
     // Logging & JSON-LD
     implementation(libs.edc.monitor.jdk.logger)
