@@ -117,7 +117,7 @@ pipeline {
                 docker rmi -f ${IMAGE_NAME}
             """
         }
-       success {
+        success {
             script {
                 def msg = """Hello,
 
@@ -137,8 +137,8 @@ Jenkins"""
                     echo "Error sending email: ${err}"
                 }
             }
-       }
-       failure {
+        }
+        failure {
             script {
                 def msg = """Hello,
 
@@ -158,6 +158,6 @@ Jenkins"""
                     echo "Error sending email: ${err}"
                 }
             }
-       }
+        }
     }
 }
