@@ -112,10 +112,40 @@ pipeline {
 
     post {
         always {
-            cleanWs()
-            sh """
-                docker rmi -f ${IMAGE_NAME}
-            """
+            script {
+                cleanWs()
+                sh """
+                    docker rmi -f ${IMAGE_NAME}
+                """
+
+                // Detect if build was triggered manually or by SCM
+                def causes = currentBuild.rawBuild.getCauses()
+                def isManual = causes.any { it.toString().contains('UserIdCause') }
+                def isSCM = causes.any { it.toString().contains('SCMTrigger') || it.toString().contains('GitLabWebHookCause') }
+
+                if (isManual) {
+                    echo "Build triggered manually — sending email to Requester"
+                    emailext(
+                        recipientProviders: [[$class: 'RequesterRecipientProvider']],
+                        subject: "Manual Build ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        body: "The manually triggered Jenkins build (${env.JOB_NAME} #${env.BUILD_NUMBER}) has completed with result: ${currentBuild.currentResult}.\n\nDetails: ${env.BUILD_URL}"
+                    )
+                } else if (isSCM) {
+                    echo "Build triggered by SCM — sending email to Developers"
+                    emailext(
+                        recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+                        subject: "Committed Build ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        body: "The Jenkins build was triggered by a code commit and has completed with result: ${currentBuild.currentResult}.\n\nDetails: ${env.BUILD_URL}"
+                    )
+                } else {
+                    echo "Build triggered by another cause — sending default notification"
+                    // emailext(
+                    //     to: 'ci-admins@example.com',
+                    //     subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    //     body: "This build was triggered automatically or by another cause.\n\nDetails: ${env.BUILD_URL}"
+                    // )
+                }
+            }
         }
 //         success {
 //             script {
