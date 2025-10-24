@@ -124,7 +124,7 @@ pipeline {
                 def isSCM = causes.any { it.toString().contains('SCMTrigger') || it.toString().contains('GitLabWebHookCause') }
 
                 if (isManual) {
-                    echo "Build triggered manually — sending email to Requester"
+                    echo "Build test triggered manually — sending email to Requester"
                     emailext(
                         recipientProviders: [[$class: 'RequesterRecipientProvider']],
                         subject: "Manual Build ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
@@ -139,11 +139,11 @@ pipeline {
                     )
                 } else {
                     echo "Build triggered by another cause — sending default notification"
-                    // emailext(
-                    //     to: 'ci-admins@example.com',
-                    //     subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                    //     body: "This build was triggered automatically or by another cause.\n\nDetails: ${env.BUILD_URL}"
-                    // )
+                    emailext(
+                        recipientProviders: [[$class: 'DevelopersRecipientProvider']],
+                        subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        body: "This build was triggered automatically or by another cause with result: ${currentBuild.currentResult}..\n\nDetails: ${env.BUILD_URL}"
+                    )
                 }
             }
         }
