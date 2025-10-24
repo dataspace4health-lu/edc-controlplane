@@ -119,7 +119,7 @@ pipeline {
                 """
 
                 // Detect if build was triggered manually or by SCM
-                def causes = currentBuild.rawBuild.getCauses()
+                def causes = currentBuild.getBuildCauses()
                 def isManual = causes.any { it.toString().contains('UserIdCause') }
                 def isSCM = causes.any { it.toString().contains('SCMTrigger') || it.toString().contains('GitLabWebHookCause') }
 
