@@ -82,7 +82,7 @@ pipeline {
                     docker run --rm \
                         -v /var/run/docker.sock:/var/run/docker.sock \
                         -v \$PWD/built/reports/trivy:/output \
-                        -v \$PWD/jenkins/trivy-html.tpl:/template.tpl \
+                        -v \$PWD/.jenkins/trivy-html.tpl:/template.tpl \
                         aquasec/trivy:latest \
                         image ${IMAGE_NAME} \
                         --exit-code 1 --timeout 15m --severity HIGH,CRITICAL \
@@ -117,47 +117,47 @@ pipeline {
                 docker rmi -f ${IMAGE_NAME}
             """
         }
-        success {
-            script {
-                def msg = """Hello,
+//         success {
+//             script {
+//                 def msg = """Hello,
 
-The Jenkins build ${env.JOB_NAME} #${env.BUILD_NUMBER} has succeeded.
+// The Jenkins build ${env.JOB_NAME} #${env.BUILD_NUMBER} has succeeded.
 
-Please check the build logs here: ${env.BUILD_URL}
+// Please check the build logs here: ${env.BUILD_URL}
 
-Regards,
-Jenkins"""
+// Regards,
+// Jenkins"""
                 
-                try {
-                    mail to: "${env.COMMIT_AUTHOR}",
-                        subject: "Build Succeeded: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: "${msg}"
-                }
-                catch (err) {
-                    echo "Error sending email: ${err}"
-                }
-            }
-        }
-        failure {
-            script {
-                def msg = """Hello,
+//                 try {
+//                     mail to: "${env.COMMIT_AUTHOR}",
+//                         subject: "Build Succeeded: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+//                         body: "${msg}"
+//                 }
+//                 catch (err) {
+//                     echo "Error sending email: ${err}"
+//                 }
+//             }
+//         }
+//         failure {
+//             script {
+//                 def msg = """Hello,
 
-The Jenkins build ${env.JOB_NAME} #${env.BUILD_NUMBER} has failed.
+// The Jenkins build ${env.JOB_NAME} #${env.BUILD_NUMBER} has failed.
 
-Please check the build logs here: ${env.BUILD_URL}
+// Please check the build logs here: ${env.BUILD_URL}
 
-Regards,
-Jenkins"""
+// Regards,
+// Jenkins"""
 
-                try {
-                    mail to: "${env.COMMIT_AUTHOR}",
-                        subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: "${msg}"
-                }
-                catch (err) {
-                    echo "Error sending email: ${err}"
-                }
-            }
-        }
+//                 try {
+//                     mail to: "${env.COMMIT_AUTHOR}",
+//                         subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+//                         body: "${msg}"
+//                 }
+//                 catch (err) {
+//                     echo "Error sending email: ${err}"
+//                 }
+//             }
+//         }
     }
 }
