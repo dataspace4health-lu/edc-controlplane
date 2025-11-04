@@ -121,7 +121,7 @@ pipeline {
                     tag = tag.replaceFirst(/^v/, "") // Trim leading v
                     // Get version defined in the code
                     def version = sh(
-                        script: "grep '^version' build.gradle.kts | head -1 | sed -E 's/version *= *\"([^\"]+)\"/\\1/'",
+                        script: "grep '^version' build.gradle.kts | head -1 | sed -E 's/version *= *\"([^\"]*)\"/\\1/'",
                         returnStdout: true
                     ).trim()
                     version = version.replaceFirst(/^v/, "") // Trim leading v
