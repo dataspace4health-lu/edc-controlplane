@@ -140,7 +140,7 @@ pipeline {
                 tag = "${tag#v}" // Trim leading v
                 
                 sh """
-                    echo "Tagging image..."
+                    echo "Tagging image ${IMAGE_NAME} ${DOCKER_IMAGE}:${tag}."
                     docker tag ${IMAGE_NAME} ${DOCKER_IMAGE}:${tag}
                 """
                 // Save it in the build description
