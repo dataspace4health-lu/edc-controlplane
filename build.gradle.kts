@@ -41,7 +41,6 @@ dependencies {
     // Missing dependencies for injection
     implementation(libs.edc.iam.mock)
     implementation(libs.edc.edr.store.core)
-    implementation(libs.edc.configuration.filesystem)
     implementation(libs.edc.dsp)
 
     // Logging & JSON-LD
