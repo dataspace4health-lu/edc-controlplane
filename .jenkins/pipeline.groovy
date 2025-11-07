@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "${env.JOB_NAME.substring(0, env.JOB_NAME.lastIndexOf('/')).tokenize('/').last().toLowerCase()}"
+        DOCKER_IMAGE = "${env.JOB_NAME.tokenize('/')[-2..-1].join('-').toLowerCase()}"
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         IMAGE_NAME = "${DOCKER_IMAGE}:${DOCKER_TAG}"
     }
@@ -14,20 +14,11 @@ pipeline {
     stages {
         stage('Lint') {
             steps {
-                script {
-                    def result = sh(script: "git branch --show-current", returnStdout: true).trim()
-                    echo "Curren branch: ${result}"
-                    result = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
-                    echo "Curren branch: ${result}"
-                    result = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
-                    echo "Curren commit: ${result}"
-                    
-                    sh """
-                        docker build --target builder -t ${IMAGE_NAME} .
-                        docker run --rm -v \$PWD:/workspace -w /workspace ${IMAGE_NAME} \
-                            chmod +x ./gradlew && ./gradlew checkstyleMain checkstyleTest
-                    """
-                }
+                sh """
+                    docker build --target builder -t ${IMAGE_NAME} .
+                    docker run --rm -v \$PWD:/workspace -w /workspace ${IMAGE_NAME} \
+                        chmod +x ./gradlew && ./gradlew checkstyleMain checkstyleTest
+                """
             }
             post {
                 always {
