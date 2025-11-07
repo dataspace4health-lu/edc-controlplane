@@ -2,8 +2,6 @@ pipeline {
     agent any
 
     environment {
-        sh 'printenv | sort'
-        
         DOCKER_IMAGE = "${env.JOB_NAME.tokenize('/').last().toLowerCase()}"
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         IMAGE_NAME = "${DOCKER_IMAGE}:${DOCKER_TAG}"
@@ -17,6 +15,8 @@ pipeline {
         stage('Lint') {
             steps {
                 script {
+                    sh 'printenv | sort'
+                    
                     def result = sh(script: "git branch --show-current", returnStdout: true).trim()
                     echo "Curren branch: ${result}"
                     result = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
