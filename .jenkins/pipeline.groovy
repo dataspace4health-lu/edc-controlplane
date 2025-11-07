@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
+        sh 'printenv | sort'
+        
         DOCKER_IMAGE = "${env.JOB_NAME.tokenize('/').last().toLowerCase()}"
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         IMAGE_NAME = "${DOCKER_IMAGE}:${DOCKER_TAG}"
-        COMMIT_AUTHOR = sh(script: "git show -s --pretty='%an <%ae>' ${GIT_COMMIT}", returnStdout: true).trim()
-
-        GRADLEW = "./gradlew"
     }
 
     parameters {
@@ -15,17 +14,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                // Default checkout — does the right thing automatically
-                checkout scm
-
-                echo "BRANCH_NAME: ${env.BRANCH_NAME}"
-                echo "GIT_BRANCH: ${env.GIT_BRANCH}"
-                echo "GIT_COMMIT: ${env.GIT_COMMIT}"
-            }
-        }
-
         stage('Lint') {
             steps {
                 script {
@@ -39,7 +27,7 @@ pipeline {
                     sh """
                         docker build --target builder -t ${IMAGE_NAME} .
                         docker run --rm -v \$PWD:/workspace -w /workspace ${IMAGE_NAME} \
-                            chmod +x ${GRADLEW} && ${GRADLEW} checkstyleMain checkstyleTest
+                            chmod +x ./gradlew && ./gradlew checkstyleMain checkstyleTest
                     """
                 }
             }
@@ -54,7 +42,7 @@ pipeline {
             steps {
                 sh """
                     docker run --rm -v \$PWD:/workspace -w /workspace ${IMAGE_NAME} \
-                        chmod +x ${GRADLEW} && ${GRADLEW} shadowJar --no-daemon -x test
+                        chmod +x ./gradlew && ./gradlew shadowJar --no-daemon -x test
                 """
             }
         }
@@ -63,7 +51,7 @@ pipeline {
             steps {
                 sh """
                     docker run --rm -v \$PWD:/workspace -w /workspace ${IMAGE_NAME} \
-                        chmod +x ${GRADLEW} && ${GRADLEW} test
+                        chmod +x ./gradlew && ./gradlew test
                 """
             }
             post {
