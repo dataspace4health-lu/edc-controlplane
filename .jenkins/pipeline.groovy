@@ -17,6 +17,11 @@ pipeline {
     stages {
         stage('Lint') {
             steps {
+                def result = sh(script: "git branch --show-current", returnStdout: true).trim()
+                echo "Curren branch: ${result}"
+                result = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                echo "Curren commit: ${result}"
+                
                 sh """
                     docker build --target builder -t ${IMAGE_NAME} .
                     docker run --rm -v \$PWD:/workspace -w /workspace ${IMAGE_NAME} \
