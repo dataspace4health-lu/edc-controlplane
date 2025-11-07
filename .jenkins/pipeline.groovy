@@ -15,6 +15,17 @@ pipeline {
     }
 
     stages {
+        stage('Checkout') {
+            steps {
+                // Default checkout — does the right thing automatically
+                checkout scm
+
+                echo "BRANCH_NAME: ${env.BRANCH_NAME}"
+                echo "GIT_BRANCH: ${env.GIT_BRANCH}"
+                echo "GIT_COMMIT: ${env.GIT_COMMIT}"
+            }
+        }
+
         stage('Lint') {
             steps {
                 script {
