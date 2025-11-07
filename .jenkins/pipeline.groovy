@@ -18,9 +18,9 @@ pipeline {
         stage('Lint') {
             steps {
                 script {
-
-                    
                     def result = sh(script: "git branch --show-current", returnStdout: true).trim()
+                    echo "Curren branch: ${result}"
+                    result = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
                     echo "Curren branch: ${result}"
                     result = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                     echo "Curren commit: ${result}"
