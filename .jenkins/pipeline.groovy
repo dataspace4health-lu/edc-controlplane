@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "${env.JOB_NAME.substring(0, jobName.lastIndexOf('/')).tokenize('/').last().toLowerCase()}"
+        DOCKER_IMAGE = "${env.JOB_NAME.substring(0, env.JOB_NAME.lastIndexOf('/')).tokenize('/').last().toLowerCase()}"
         DOCKER_TAG = "${env.BUILD_NUMBER}"
         IMAGE_NAME = "${DOCKER_IMAGE}:${DOCKER_TAG}"
     }
