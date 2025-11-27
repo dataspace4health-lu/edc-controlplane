@@ -26,6 +26,9 @@ RUN ./gradlew shadowJar --no-daemon -x test
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 
+# Set default log level (can be overridden at runtime)
+ENV LOG_LEVEL=info
+
 # Install helper tools if needed
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl jq \
@@ -35,4 +38,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=builder /workspace/build/libs/*.jar /app/controlplane.jar
 
 # Run the jar with config + logging
-CMD ["java", "-jar", "/app/controlplane.jar"]
+CMD ["sh", "-c", "exec java -jar /app/controlplane.jar --log-level=$LOG_LEVEL"]

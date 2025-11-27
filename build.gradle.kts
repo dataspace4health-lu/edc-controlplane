@@ -39,7 +39,7 @@ dependencies {
     
 
     // Missing dependencies for injection
-    implementation(libs.edc.iam.mock)
+    //implementation(libs.edc.iam.mock)
     implementation(libs.edc.edr.store.core)
     implementation(libs.edc.dsp)
 
@@ -51,6 +51,20 @@ dependencies {
     // PostgreSQL support
     implementation(libs.bundles.sql.edc)
 
+    // Vault support
+    implementation(libs.edc.vault.hashicorp)
+    implementation(libs.edc.sts.remote.client)
+
+    // Identityhub support
+    implementation(libs.edc.identity.trust.service)
+    implementation(libs.edc.core.spi)
+    implementation(libs.edc.oauth2.client)
+    implementation(libs.edc.did.core)
+    implementation(libs.edc.did.web)
+    implementation(libs.edc.identity.trust.core)
+    implementation(libs.edc.spi.token)
+    implementation(libs.edc.spi.jwt)
+    implementation(libs.edc.token.core)
 }
 
 application {
