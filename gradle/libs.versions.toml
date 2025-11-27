@@ -32,7 +32,6 @@ edc-sql-pool = { module = "org.eclipse.edc:sql-pool-apache-commons", version.ref
 edc-sql-transactionlocal = { module = "org.eclipse.edc:transaction-local", version.ref = "edc" }
 edc-sql-dataplane-instancestore = { module = "org.eclipse.edc:data-plane-instance-store-sql", version.ref = "edc" }
 
-
 # BOM modules
 edc-bom-controlplane-base = { module = "org.eclipse.edc:controlplane-base-bom", version.ref = "edc" }
 edc-bom-dataplane-base = { module = "org.eclipse.edc:dataplane-base-bom", version.ref = "edc" }
@@ -101,12 +100,23 @@ edc-management-api = { module = "org.eclipse.edc:management-api", version.ref = 
 edc-management-api-test-fixtures = { module = "org.eclipse.edc:management-api-test-fixtures", version.ref = "edc" }
 edc-monitor-jdk-logger = { module = "org.eclipse.edc:monitor-jdk-logger", version.ref = "edc" }
 
+# EDC STS dependencies, used in IdentityHub
+edc-sts-remote-client = { module = "org.eclipse.edc:identity-trust-sts-remote-client", version.ref = "edc" }
+
 edc-vault-hashicorp = { module = "org.eclipse.edc:vault-hashicorp", version.ref = "edc" }
 edc-vault-hashicorp-spi = { module = "org.eclipse.edc:vault-hashicorp-spi", version.ref = "edc" }
 edc-vault-filesystem = { module = "org.eclipse.edc:vault-filesystem", version.ref = "edc-vault" }
 edc-validator-data-address-http-data = { module = "org.eclipse.edc:validator-data-address-http-data", version.ref = "edc" }
 edc-web-spi = { module = "org.eclipse.edc:web-spi", version.ref = "edc" }
 
+edc-dcp-core = { module = "org.eclipse.edc:identity-trust-core", version.ref = "edc" }
+edc-dcp = { module = "org.eclipse.edc:identity-trust-service", version.ref = "edc" }
+edc-did-core = { module = "org.eclipse.edc:identity-did-core", version.ref = "edc" }
+edc-did-web = { module = "org.eclipse.edc:identity-did-web", version.ref = "edc" }
+edc-oauth2-client = { module = "org.eclipse.edc:oauth2-client", version.ref = "edc" }
+edc-identity-trust = { module = "org.eclipse.edc:identity-trust", version.ref = "edc" }
+edc-identity-trust-service = { module = "org.eclipse.edc:identity-trust-service", version.ref = "edc" }
+edc-identity-trust-core = { module = "org.eclipse.edc:identity-trust-core", version.ref = "edc" }
 
 # federated catalog modules
 edc-fc-spi-core = { module = "org.eclipse.edc:federated-catalog-spi", version.ref = "edc" }
@@ -121,6 +131,11 @@ edc-fc-api = { module = "org.eclipse.edc:federated-catalog-api", version.ref = "
 edc-iam-spi-core  = { module = "org.eclipse.edc:identity-hub-spi", version.ref = "edc" }
 edc-iam-spi-did  = { module = "org.eclipse.edc:did-spi", version.ref = "edc" }
 edc-iam-mock = { module = "org.eclipse.edc:iam-mock", version.ref = "edc" }
+edc-spi-identity-did = { module = "org.eclipse.edc:identity-did-spi", version.ref = "edc" }
+edc-spi-identity-trust = { module = "org.eclipse.edc:identity-trust-spi", version.ref = "edc" }
+edc-spi-transform = { module = "org.eclipse.edc:transform-spi", version.ref = "edc" }
+edc-spi-token = { module = "org.eclipse.edc:token-spi", version.ref = "edc" }
+edc-spi-jwt = { module = "org.eclipse.edc:jwt-spi", version.ref = "edc" }
 
 # Third party libs
 jakarta-rsApi = { module = "jakarta.ws.rs:jakarta.ws.rs-api", version.ref = "rsApi" }
@@ -129,6 +144,14 @@ okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.
 minio-io = { module = "io.minio:minio", version = "8.5.17" }
 apache-commons-lang = {module = "org.apache.commons:commons-lang3", version = "3.14.0"}
 
+edc-api-secrets = { module = "org.eclipse.edc:secrets-api", version.ref = "edc" }
+
+# EDC lib dependencies
+edc-lib-jws2020 = { module = "org.eclipse.edc:jws2020-lib", version.ref = "edc" }
+edc-lib-transform = { module = "org.eclipse.edc:transform-lib", version.ref = "edc" }
+edc-lib-crypto = { module = "org.eclipse.edc:crypto-common-lib", version.ref = "edc" }
+edc-lib-keys = { module = "org.eclipse.edc:keys-lib", version.ref = "edc" }
+edc-lib-jsonld = { module = "org.eclipse.edc:json-ld-lib", version.ref = "edc" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version = "8.3.8" }
@@ -145,4 +168,12 @@ sql-edc = [
     "edc-sql-contractdef",
     "edc-sql-contractneg",
     "edc-sql-transferprocess"
+]
+
+dcp = [
+    "edc-dcp",
+    "edc-did-core",
+    "edc-did-web",
+    "edc-oauth2-client",
+    "edc-dcp-core",
 ]
