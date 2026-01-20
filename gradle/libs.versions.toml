@@ -3,7 +3,7 @@ format.version = "1.1"
 
 [versions]
 awaitility = "4.2.2"
-edc = "0.13.0"
+edc = "0.15.1"
 okhttp-mockwebserver = "5.1.0"
 restAssured = "5.5.5"
 rsApi = "4.0.0"
@@ -28,6 +28,7 @@ edc-sql-policydef = { module = "org.eclipse.edc:policy-definition-store-sql", ve
 edc-sql-transferprocess = { module = "org.eclipse.edc:transfer-process-store-sql", version.ref = "edc" }
 edc-sql-core = { module = "org.eclipse.edc:sql-core", version.ref = "edc" }
 edc-sql-lease = { module = "org.eclipse.edc:sql-lease", version.ref = "edc" }
+edc-sql-lease-core = { module = "org.eclipse.edc:sql-lease-core", version.ref = "edc" }
 edc-sql-pool = { module = "org.eclipse.edc:sql-pool-apache-commons", version.ref = "edc" }
 edc-sql-transactionlocal = { module = "org.eclipse.edc:transaction-local", version.ref = "edc" }
 edc-sql-dataplane-instancestore = { module = "org.eclipse.edc:data-plane-instance-store-sql", version.ref = "edc" }
@@ -82,12 +83,14 @@ edc-policy-spi = { module = "org.eclipse.edc:policy-spi", version.ref = "edc" }
 edc-policy-request-context-spi = { module = "org.eclipse.edc:policy-request-context-spi", version.ref = "edc" }
 edc-policy-engine-spi = { module = "org.eclipse.edc:policy-engine-spi", version.ref = "edc" }
 edc-participant-spi = { module = "org.eclipse.edc:participant-spi", version.ref = "edc" }
+edc-participant-context-single-core = { module = "org.eclipse.edc:participant-context-single-core", version.ref = "edc" }
 edc-contract-spi = { module = "org.eclipse.edc:contract-spi", version.ref = "edc" }
 edc-transaction-spi = { module = "org.eclipse.edc:transaction-spi", version.ref = "edc" }
 edc-transactions-datasource-spi = { module = "org.eclipse.edc:transaction-datasource-spi", version.ref = "edc" }
 edc-transfer-spi = { module = "org.eclipse.edc:transfer-spi", version.ref = "edc" }
 
 edc-dsp = { module = "org.eclipse.edc:dsp", version.ref = "edc" }
+edc-decentralized-claims-core = { module = "org.eclipse.edc:decentralized-claims-core", version.ref = "edc" }
 edc-edr-cache-api = { module = "org.eclipse.edc:edr-cache-api", version.ref = "edc" }
 edc-edr-store-core = { module = "org.eclipse.edc:edr-store-core", version.ref = "edc" }
 edc-edr-store-receiver = { module = "org.eclipse.edc:edr-store-receiver", version.ref = "edc" }
@@ -101,7 +104,8 @@ edc-management-api-test-fixtures = { module = "org.eclipse.edc:management-api-te
 edc-monitor-jdk-logger = { module = "org.eclipse.edc:monitor-jdk-logger", version.ref = "edc" }
 
 # EDC STS dependencies, used in IdentityHub
-edc-sts-remote-client = { module = "org.eclipse.edc:identity-trust-sts-remote-client", version.ref = "edc" }
+# NOTE: These modules were moved to IdentityHub in EDC 0.15.0 and no longer exist in Connector
+# edc-sts-remote-client = { module = "org.eclipse.edc:identity-trust-sts-remote-client", version.ref = "edc14" } 
 
 edc-vault-hashicorp = { module = "org.eclipse.edc:vault-hashicorp", version.ref = "edc" }
 edc-vault-hashicorp-spi = { module = "org.eclipse.edc:vault-hashicorp-spi", version.ref = "edc" }
@@ -109,14 +113,16 @@ edc-vault-filesystem = { module = "org.eclipse.edc:vault-filesystem", version.re
 edc-validator-data-address-http-data = { module = "org.eclipse.edc:validator-data-address-http-data", version.ref = "edc" }
 edc-web-spi = { module = "org.eclipse.edc:web-spi", version.ref = "edc" }
 
-edc-dcp-core = { module = "org.eclipse.edc:identity-trust-core", version.ref = "edc" }
-edc-dcp = { module = "org.eclipse.edc:identity-trust-service", version.ref = "edc" }
+
 edc-did-core = { module = "org.eclipse.edc:identity-did-core", version.ref = "edc" }
 edc-did-web = { module = "org.eclipse.edc:identity-did-web", version.ref = "edc" }
 edc-oauth2-client = { module = "org.eclipse.edc:oauth2-client", version.ref = "edc" }
 edc-identity-trust = { module = "org.eclipse.edc:identity-trust", version.ref = "edc" }
-edc-identity-trust-service = { module = "org.eclipse.edc:identity-trust-service", version.ref = "edc" }
-edc-identity-trust-core = { module = "org.eclipse.edc:identity-trust-core", version.ref = "edc" }
+# NOTE: These modules were moved to IdentityHub in EDC 0.15.0 and no longer exist in Connector
+# edc-identity-trust-service = { module = "org.eclipse.edc:identity-trust-service", version.ref = "edc14" }
+# edc-identity-trust-core = { module = "org.eclipse.edc:identity-trust-core", version.ref = "edc14" }
+# edc-dcp-core = { module = "org.eclipse.edc:identity-trust-core", version.ref = "edc14" }
+# edc-dcp = { module = "org.eclipse.edc:identity-trust-service", version.ref = "edc14" }
 
 # federated catalog modules
 edc-fc-spi-core = { module = "org.eclipse.edc:federated-catalog-spi", version.ref = "edc" }
@@ -171,9 +177,9 @@ sql-edc = [
 ]
 
 dcp = [
-    "edc-dcp",
+#   "edc-identity-trust-service",
     "edc-did-core",
     "edc-did-web",
     "edc-oauth2-client",
-    "edc-dcp-core",
+#  "edc-identity-trust-core",
 ]

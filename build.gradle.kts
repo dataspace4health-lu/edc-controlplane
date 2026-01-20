@@ -42,7 +42,9 @@ dependencies {
     //implementation(libs.edc.iam.mock)
     implementation(libs.edc.edr.store.core)
     implementation(libs.edc.dsp)
-
+    implementation(libs.edc.participant.context.single.core)
+    implementation(libs.edc.decentralized.claims.core)
+    
     // Logging & JSON-LD
     implementation(libs.edc.monitor.jdk.logger)
     implementation(libs.edc.json.ld.lib)
@@ -50,18 +52,21 @@ dependencies {
     
     // PostgreSQL support
     implementation(libs.bundles.sql.edc)
+    implementation(libs.edc.sql.lease.core)
 
     // Vault support
     implementation(libs.edc.vault.hashicorp)
-    implementation(libs.edc.sts.remote.client)
+   
 
     // Identityhub support
-    implementation(libs.edc.identity.trust.service)
+    // NOTE: STS and identity-trust modules moved to IdentityHub in EDC 0.15.0
+    // implementation(libs.edc.sts.remote.client)
+    // implementation(libs.edc.identity.trust.service)
+    // implementation(libs.edc.identity.trust.core)
     implementation(libs.edc.core.spi)
     implementation(libs.edc.oauth2.client)
     implementation(libs.edc.did.core)
     implementation(libs.edc.did.web)
-    implementation(libs.edc.identity.trust.core)
     implementation(libs.edc.spi.token)
     implementation(libs.edc.spi.jwt)
     implementation(libs.edc.token.core)
