@@ -14,6 +14,7 @@ RUN ./gradlew dependencies --no-daemon || return 0
 
 # Copy source files explicitly (avoids recursive copy of entire directory)
 COPY config ./config
+COPY extensions ./extensions
 
 # Build the fat jar (skip tests for faster builds, remove -x test if you want them)
 RUN ./gradlew shadowJar --no-daemon -x test
