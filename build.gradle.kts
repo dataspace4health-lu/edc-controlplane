@@ -36,6 +36,7 @@ dependencies {
 
     // Data plane (HTTP)
     implementation(libs.edc.data.plane.signaling.client)
+    implementation(libs.edc.transfer.data.plane.signaling)
     implementation(libs.edc.data.plane.selector.api)
     implementation(libs.edc.data.plane.selector.core)
     implementation(libs.edc.data.plane.selector.control.api)
@@ -44,6 +45,9 @@ dependencies {
     
     // Missing dependencies for injection
     implementation(libs.edc.edr.store.core)
+    implementation(libs.edc.sql.edrcache)
+    // CRITICAL: EDR Store Receiver - listens to transfer events and saves EDRs to vault
+    implementation(libs.edc.edr.store.receiver)
     implementation(libs.edc.dsp)
     implementation(libs.edc.participant.context.single.core)
     implementation(libs.edc.decentralized.claims.core)
