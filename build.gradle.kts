@@ -19,6 +19,20 @@ allprojects {
             url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
         }
     }
+
+    // Pin jackson-core (only) to 2.21.1 to fix GHSA-72hv-8253-57qq (Number Length Constraint
+    // Bypass in Async Parser, published 2026-02-26). EDC BOM 0.15.1 resolves 2.20.1 which is
+    // in the affected range 2.19.0-2.21.0; patched version is 2.21.1.
+    // NOTE: only jackson-core received the 2.21.1 security patch — jackson-annotations and
+    // jackson-databind have no 2.21.1 release and must remain at their BOM-resolved versions.
+    configurations.configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "com.fasterxml.jackson.core" && requested.name == "jackson-core") {
+                useVersion("2.21.1")
+                because("GHSA-72hv-8253-57qq: pin jackson-core to 2.21.1 (patched)")
+            }
+        }
+    }
 }
 
 dependencies {
