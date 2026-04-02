@@ -8,6 +8,7 @@ import org.eclipse.edc.policy.engine.spi.PolicyContext;
 import org.eclipse.edc.policy.engine.spi.PolicyEngine;
 import org.eclipse.edc.policy.engine.spi.RuleBindingRegistry;
 import org.eclipse.edc.policy.model.Permission;
+import org.eclipse.edc.policy.model.Prohibition;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.system.ServiceExtension;
@@ -96,6 +97,14 @@ public class PolicyEvaluationExtension implements ServiceExtension {
         bindToNegotiation(PolicyConstants.SUPPORTED_PROTOCOLS_CONSTRAINT_KEY,
                 PolicyConstants.SUPPORTED_PROTOCOLS_CLAIM,
                 PolicyConstants.VALID_SUPPORTED_PROTOCOLS);
+
+        bindProhibitionToNegotiation(PolicyConstants.EU_EEA_STATUS_CONSTRAINT_KEY,
+                PolicyConstants.EU_EEA_STATUS_CLAIM,
+                PolicyConstants.VALID_EU_EEA_STATUSES);
+
+        bindProhibitionToNegotiation(PolicyConstants.ORGANIZATION_OWNERSHIP_TYPE_CONSTRAINT_KEY,
+                PolicyConstants.ORGANIZATION_OWNERSHIP_TYPE_CLAIM,
+                PolicyConstants.VALID_ORGANIZATION_OWNERSHIP_TYPES);
     }
 
     /**
@@ -137,6 +146,14 @@ public class PolicyEvaluationExtension implements ServiceExtension {
         bindToTransfer(PolicyConstants.SUPPORTED_PROTOCOLS_CONSTRAINT_KEY,
                 PolicyConstants.SUPPORTED_PROTOCOLS_CLAIM,
                 PolicyConstants.VALID_SUPPORTED_PROTOCOLS);
+
+        bindProhibitionToTransfer(PolicyConstants.EU_EEA_STATUS_CONSTRAINT_KEY,
+                PolicyConstants.EU_EEA_STATUS_CLAIM,
+                PolicyConstants.VALID_EU_EEA_STATUSES);
+
+        bindProhibitionToTransfer(PolicyConstants.ORGANIZATION_OWNERSHIP_TYPE_CONSTRAINT_KEY,
+                PolicyConstants.ORGANIZATION_OWNERSHIP_TYPE_CLAIM,
+                PolicyConstants.VALID_ORGANIZATION_OWNERSHIP_TYPES);
     }
 
     // ── Scope-specific bind helpers ───────────────────────────────────────────
@@ -162,12 +179,41 @@ public class PolicyEvaluationExtension implements ServiceExtension {
                 TransferProcessPolicyContext.class, TransferProcessPolicyContext.TRANSFER_SCOPE, constraintKey);
     }
 
+    private void bindProhibitionToCatalog(String constraintKey, String claimName, java.util.Set<String> allowedValues) {
+        bindProhibitionFunction(
+                ProhibitionCredentialClaimEvaluationFunction.<CatalogPolicyContext>create(
+                        claimName, allowedValues, monitor.withPrefix("ProhibitionClaimEval[" + claimName + "][catalog]")),
+                CatalogPolicyContext.class, CatalogPolicyContext.CATALOG_SCOPE, constraintKey);
+    }
+
+    private void bindProhibitionToNegotiation(String constraintKey, String claimName, java.util.Set<String> allowedValues) {
+        bindProhibitionFunction(
+                ProhibitionCredentialClaimEvaluationFunction.<ContractNegotiationPolicyContext>create(
+                        claimName, allowedValues, monitor.withPrefix("ProhibitionClaimEval[" + claimName + "][negotiation]")),
+                ContractNegotiationPolicyContext.class, ContractNegotiationPolicyContext.NEGOTIATION_SCOPE, constraintKey);
+    }
+
+    private void bindProhibitionToTransfer(String constraintKey, String claimName, java.util.Set<String> allowedValues) {
+        bindProhibitionFunction(
+                ProhibitionCredentialClaimEvaluationFunction.<TransferProcessPolicyContext>create(
+                        claimName, allowedValues, monitor.withPrefix("ProhibitionClaimEval[" + claimName + "][transfer]")),
+                TransferProcessPolicyContext.class, TransferProcessPolicyContext.TRANSFER_SCOPE, constraintKey);
+    }
+
     private <C extends PolicyContext> void bindPermissionFunction(AtomicConstraintRuleFunction<Permission, C> function, Class<C> contextClass, String scope, String constraintType) {
         ruleBindingRegistry.bind("use", scope);
         ruleBindingRegistry.bind(ODRL_SCHEMA + "use", scope);
         ruleBindingRegistry.bind(constraintType, scope);
 
         policyEngine.registerFunction(contextClass, Permission.class, constraintType, function);
+    }
+
+    private <C extends PolicyContext> void bindProhibitionFunction(AtomicConstraintRuleFunction<Prohibition, C> function, Class<C> contextClass, String scope, String constraintType) {
+        ruleBindingRegistry.bind("use", scope);
+        ruleBindingRegistry.bind(ODRL_SCHEMA + "use", scope);
+        ruleBindingRegistry.bind(constraintType, scope);
+
+        policyEngine.registerFunction(contextClass, Prohibition.class, constraintType, function);
     }
 
 }

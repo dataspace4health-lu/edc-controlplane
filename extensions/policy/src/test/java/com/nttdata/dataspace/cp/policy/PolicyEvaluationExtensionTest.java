@@ -6,6 +6,7 @@ import org.eclipse.edc.connector.controlplane.contract.spi.policy.TransferProces
 import org.eclipse.edc.policy.engine.spi.PolicyEngine;
 import org.eclipse.edc.policy.engine.spi.RuleBindingRegistry;
 import org.eclipse.edc.policy.model.Permission;
+import org.eclipse.edc.policy.model.Prohibition;
 import org.eclipse.edc.spi.monitor.Monitor;
 import org.eclipse.edc.spi.system.ServiceExtensionContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -179,5 +180,51 @@ class PolicyEvaluationExtensionTest {
                 eq(PolicyConstants.EU_EEA_STATUS_CONSTRAINT_KEY), any());
         verify(policyEngine, atLeastOnce()).registerFunction(eq(TransferProcessPolicyContext.class), eq(Permission.class),
                 eq(PolicyConstants.MEMBERSHIP_STATUS_CONSTRAINT_KEY), any());
+    }
+
+    // ── Prohibition scope bindings ────────────────────────────────────────────
+
+    @Test
+    void initialize_doesNotRegisterAnyProhibitionFunctionForCatalogContext() {
+        extension.initialize(context);
+        // No prohibition functions are registered for catalog — catalog is a lightweight visibility gate only
+        verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(CatalogPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.MEMBERSHIP_STATUS_CONSTRAINT_KEY), any());
+        verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(CatalogPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.EU_EEA_STATUS_CONSTRAINT_KEY), any());
+        verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(CatalogPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.ORGANIZATION_ROLES_CONSTRAINT_KEY), any());
+    }
+
+    @Test
+    void initialize_registersOnlyEuEeaAndOwnershipProhibitionFunctionsForNegotiationContext() {
+        extension.initialize(context);
+        // Only euEeaStatus and organizationOwnershipType prohibition functions are registered
+        verify(policyEngine, atLeastOnce()).registerFunction(eq(ContractNegotiationPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.EU_EEA_STATUS_CONSTRAINT_KEY), any());
+        verify(policyEngine, atLeastOnce()).registerFunction(eq(ContractNegotiationPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.ORGANIZATION_OWNERSHIP_TYPE_CONSTRAINT_KEY), any());
+        // Other prohibition functions must NOT be registered for negotiation context
+        verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(ContractNegotiationPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.MEMBERSHIP_STATUS_CONSTRAINT_KEY), any());
+        verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(ContractNegotiationPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.ORGANIZATION_ROLES_CONSTRAINT_KEY), any());
+        verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(ContractNegotiationPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.ORGANIZATION_TYPE_CONSTRAINT_KEY), any());
+    }
+
+    @Test
+    void initialize_registersOnlyEuEeaAndOwnershipProhibitionFunctionsForTransferContext() {
+        extension.initialize(context);
+        // Only euEeaStatus and organizationOwnershipType prohibition functions are registered
+        verify(policyEngine, atLeastOnce()).registerFunction(eq(TransferProcessPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.EU_EEA_STATUS_CONSTRAINT_KEY), any());
+        verify(policyEngine, atLeastOnce()).registerFunction(eq(TransferProcessPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.ORGANIZATION_OWNERSHIP_TYPE_CONSTRAINT_KEY), any());
+        // Other prohibition functions must NOT be registered for transfer context
+        verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(TransferProcessPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.MEMBERSHIP_STATUS_CONSTRAINT_KEY), any());
+        verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(TransferProcessPolicyContext.class), eq(Prohibition.class),
+                eq(PolicyConstants.ORGANIZATION_ROLES_CONSTRAINT_KEY), any());
     }
 }
