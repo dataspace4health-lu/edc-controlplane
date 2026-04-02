@@ -32,7 +32,7 @@ All constraints check a named claim inside `credentialSubject` of the presented 
 | `dataProtectionRole` | `credentialSubject.dataProtectionRole` | `controller`, `joint-controller`, `processor` |
 | `jurisdictionCountry` | `credentialSubject.jurisdictionCountry` | any ISO 3166-1 alpha-2 code |
 | `supportedProtocols` | `credentialSubject.supportedProtocols` | `dataspace-protocol-http:2025-1` |
-
+´´
 ---
 
 ## Adding a new policy constraint
@@ -40,3 +40,162 @@ All constraints check a named claim inside `credentialSubject` of the presented 
 `CredentialClaimEvaluationFunction` is generic and handles any `credentialSubject` attribute — no new class is needed for simple scalar or list claims. Add the constant to `PolicyConstants`, then register it in the appropriate scope method in `PolicyEvaluationExtension`.
 
 If the new policy requires logic that goes beyond a `credentialSubject` claim check (e.g. cross-credential validation, time-based rules, or a different credential type structure), a new evaluation function implementing `AtomicConstraintRuleFunction` must be written and registered.
+
+## Permission
+{
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "http://www.w3.org/ns/odrl/2/action": {
+    "@id": "http://www.w3.org/ns/odrl/2/use"
+  },
+  "http://www.w3.org/ns/odrl/2/constraint": {
+    "http://www.w3.org/ns/odrl/2/and": [
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/membershipStatus"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "active"
+      },
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/euEeaStatus"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "eu-member-state"
+      },
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/organizationType"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "research-organization"
+      },
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/dataProtectionRole"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "controller"
+      },
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/jurisdictionCountry"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "LU"
+      },
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/organizationOwnershipType"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "public"
+      },
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/supportedProtocols"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "dataspace-protocol-http:2025-1"
+      },
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/organizationRoles"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "health-data-user"
+      },
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/organizationRoles"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "health-data-applicant"
+      }
+    ]
+  }
+}
+
+## Prohibition
+{
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "http://www.w3.org/ns/odrl/2/action": {
+    "@id": "http://www.w3.org/ns/odrl/2/use"
+  },
+  "http://www.w3.org/ns/odrl/2/constraint": {
+    "http://www.w3.org/ns/odrl/2/and": [
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/euEeaStatus"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "third-country"
+      },
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/organizationOwnershipType"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "private"
+      }
+    ]
+  }
+}
+
+## Obligation
+{
+  "@context": {
+    "@vocab": "https://w3id.org/edc/v0.0.1/ns/"
+  },
+  "http://www.w3.org/ns/odrl/2/action": {
+    "@id": "http://www.w3.org/ns/odrl/2/use"
+  },
+  "http://www.w3.org/ns/odrl/2/constraint": {
+    "http://www.w3.org/ns/odrl/2/and": [
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/euEeaStatus"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "third-country"
+      },
+      {
+        "http://www.w3.org/ns/odrl/2/leftOperand": {
+          "@id": "https://w3id.org/edc/v0.0.1/ns/organizationOwnershipType"
+        },
+        "http://www.w3.org/ns/odrl/2/operator": {
+          "@id": "http://www.w3.org/ns/odrl/2/eq"
+        },
+        "http://www.w3.org/ns/odrl/2/rightOperand": "private"
+      }
+    ]
+  }
+}

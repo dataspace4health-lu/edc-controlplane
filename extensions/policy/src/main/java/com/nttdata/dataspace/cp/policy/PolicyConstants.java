@@ -80,6 +80,20 @@ public class PolicyConstants {
     public static final String SUPPORTED_PROTOCOLS_CLAIM = "supportedProtocols";
 
     // ─────────────────────────────────────────────────────────────────────────
+    // Obligation claim keys
+    // These are top-level boolean properties inside credentialSubject, e.g.:
+    //   credentialSubject.dacApproval   = "true"
+    //   credentialSubject.permitIssued  = "true"
+    // At least one must be true for the obligation to be fulfilled.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** Data Access Committee approval flag. credentialSubject.dacApproval = "true" */
+    public static final String DAC_APPROVAL_CLAIM = "dacApproval";
+
+    /** Data permit issued flag. credentialSubject.permitIssued = "true" */
+    public static final String PERMIT_ISSUED_CLAIM = "permitIssued";
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Constraint keys (fully-expanded IRIs used for RuleBindingRegistry and
     // PolicyEngine registration). These match the JSON-LD-expanded leftOperand.
     // ─────────────────────────────────────────────────────────────────────────
@@ -92,6 +106,8 @@ public class PolicyConstants {
     public static final String DATA_PROTECTION_ROLE_CONSTRAINT_KEY     = EDC_NAMESPACE + DATA_PROTECTION_ROLE_CLAIM;
     public static final String MEMBERSHIP_STATUS_CONSTRAINT_KEY        = EDC_NAMESPACE + MEMBERSHIP_STATUS_CLAIM;
     public static final String SUPPORTED_PROTOCOLS_CONSTRAINT_KEY      = EDC_NAMESPACE + SUPPORTED_PROTOCOLS_CLAIM;
+    public static final String DAC_APPROVAL_CONSTRAINT_KEY             = EDC_NAMESPACE + DAC_APPROVAL_CLAIM;
+    public static final String PERMIT_ISSUED_CONSTRAINT_KEY            = EDC_NAMESPACE + PERMIT_ISSUED_CLAIM;
 
     // ─────────────────────────────────────────────────────────────────────────
     // Valid values for each enumerated field.
@@ -126,4 +142,7 @@ public class PolicyConstants {
 
     public static final Set<String> VALID_SUPPORTED_PROTOCOLS = Set.of(
             "dataspace-protocol-http:2025-1");
+
+    /** Valid values for boolean obligation claims (dacApproval, permitIssued). */
+    public static final Set<String> VALID_BOOLEAN_VALUES = Set.of("true", "false");
 }

@@ -7,6 +7,7 @@ import org.eclipse.edc.policy.engine.spi.AtomicConstraintRuleFunction;
 import org.eclipse.edc.policy.engine.spi.PolicyContext;
 import org.eclipse.edc.policy.engine.spi.PolicyEngine;
 import org.eclipse.edc.policy.engine.spi.RuleBindingRegistry;
+import org.eclipse.edc.policy.model.Duty;
 import org.eclipse.edc.policy.model.Permission;
 import org.eclipse.edc.policy.model.Prohibition;
 import org.eclipse.edc.runtime.metamodel.annotation.Inject;
@@ -105,6 +106,17 @@ public class PolicyEvaluationExtension implements ServiceExtension {
         bindProhibitionToNegotiation(PolicyConstants.ORGANIZATION_OWNERSHIP_TYPE_CONSTRAINT_KEY,
                 PolicyConstants.ORGANIZATION_OWNERSHIP_TYPE_CLAIM,
                 PolicyConstants.VALID_ORGANIZATION_OWNERSHIP_TYPES);
+
+        // Register atomic duty evaluators for dacApproval and permitIssued.
+        // OR semantics are expressed in the policy definition with a single duty
+        // containing an odrl:or constraint; two separate duties are evaluated as AND.
+        bindDutyToNegotiation(PolicyConstants.DAC_APPROVAL_CONSTRAINT_KEY,
+                PolicyConstants.DAC_APPROVAL_CLAIM,
+                PolicyConstants.VALID_BOOLEAN_VALUES);
+
+        bindDutyToNegotiation(PolicyConstants.PERMIT_ISSUED_CONSTRAINT_KEY,
+                PolicyConstants.PERMIT_ISSUED_CLAIM,
+                PolicyConstants.VALID_BOOLEAN_VALUES);
     }
 
     /**
@@ -154,6 +166,17 @@ public class PolicyEvaluationExtension implements ServiceExtension {
         bindProhibitionToTransfer(PolicyConstants.ORGANIZATION_OWNERSHIP_TYPE_CONSTRAINT_KEY,
                 PolicyConstants.ORGANIZATION_OWNERSHIP_TYPE_CLAIM,
                 PolicyConstants.VALID_ORGANIZATION_OWNERSHIP_TYPES);
+
+        // Register atomic duty evaluators for dacApproval and permitIssued.
+        // OR semantics are expressed in the policy definition with a single duty
+        // containing an odrl:or constraint; two separate duties are evaluated as AND.
+        bindDutyToTransfer(PolicyConstants.DAC_APPROVAL_CONSTRAINT_KEY,
+                PolicyConstants.DAC_APPROVAL_CLAIM,
+                PolicyConstants.VALID_BOOLEAN_VALUES);
+
+        bindDutyToTransfer(PolicyConstants.PERMIT_ISSUED_CONSTRAINT_KEY,
+                PolicyConstants.PERMIT_ISSUED_CLAIM,
+                PolicyConstants.VALID_BOOLEAN_VALUES);
     }
 
     // ── Scope-specific bind helpers ───────────────────────────────────────────
@@ -179,13 +202,6 @@ public class PolicyEvaluationExtension implements ServiceExtension {
                 TransferProcessPolicyContext.class, TransferProcessPolicyContext.TRANSFER_SCOPE, constraintKey);
     }
 
-    private void bindProhibitionToCatalog(String constraintKey, String claimName, java.util.Set<String> allowedValues) {
-        bindProhibitionFunction(
-                ProhibitionCredentialClaimEvaluationFunction.<CatalogPolicyContext>create(
-                        claimName, allowedValues, monitor.withPrefix("ProhibitionClaimEval[" + claimName + "][catalog]")),
-                CatalogPolicyContext.class, CatalogPolicyContext.CATALOG_SCOPE, constraintKey);
-    }
-
     private void bindProhibitionToNegotiation(String constraintKey, String claimName, java.util.Set<String> allowedValues) {
         bindProhibitionFunction(
                 ProhibitionCredentialClaimEvaluationFunction.<ContractNegotiationPolicyContext>create(
@@ -197,6 +213,20 @@ public class PolicyEvaluationExtension implements ServiceExtension {
         bindProhibitionFunction(
                 ProhibitionCredentialClaimEvaluationFunction.<TransferProcessPolicyContext>create(
                         claimName, allowedValues, monitor.withPrefix("ProhibitionClaimEval[" + claimName + "][transfer]")),
+                TransferProcessPolicyContext.class, TransferProcessPolicyContext.TRANSFER_SCOPE, constraintKey);
+    }
+
+    private void bindDutyToNegotiation(String constraintKey, String claimName, java.util.Set<String> allowedValues) {
+        bindDutyFunction(
+                DutyCredentialClaimEvaluationFunction.<ContractNegotiationPolicyContext>create(
+                        claimName, allowedValues, monitor.withPrefix("ObligationClaimEval[" + claimName + "][negotiation]")),
+                ContractNegotiationPolicyContext.class, ContractNegotiationPolicyContext.NEGOTIATION_SCOPE, constraintKey);
+    }
+
+    private void bindDutyToTransfer(String constraintKey, String claimName, java.util.Set<String> allowedValues) {
+        bindDutyFunction(
+                DutyCredentialClaimEvaluationFunction.<TransferProcessPolicyContext>create(
+                        claimName, allowedValues, monitor.withPrefix("ObligationClaimEval[" + claimName + "][transfer]")),
                 TransferProcessPolicyContext.class, TransferProcessPolicyContext.TRANSFER_SCOPE, constraintKey);
     }
 
@@ -214,6 +244,14 @@ public class PolicyEvaluationExtension implements ServiceExtension {
         ruleBindingRegistry.bind(constraintType, scope);
 
         policyEngine.registerFunction(contextClass, Prohibition.class, constraintType, function);
+    }
+
+    private <C extends PolicyContext> void bindDutyFunction(AtomicConstraintRuleFunction<Duty, C> function, Class<C> contextClass, String scope, String constraintType) {
+        ruleBindingRegistry.bind("use", scope);
+        ruleBindingRegistry.bind(ODRL_SCHEMA + "use", scope);
+        ruleBindingRegistry.bind(constraintType, scope);
+
+        policyEngine.registerFunction(contextClass, Duty.class, constraintType, function);
     }
 
 }

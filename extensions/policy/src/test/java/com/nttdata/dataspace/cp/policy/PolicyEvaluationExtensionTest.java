@@ -5,6 +5,7 @@ import org.eclipse.edc.connector.controlplane.contract.spi.policy.ContractNegoti
 import org.eclipse.edc.connector.controlplane.contract.spi.policy.TransferProcessPolicyContext;
 import org.eclipse.edc.policy.engine.spi.PolicyEngine;
 import org.eclipse.edc.policy.engine.spi.RuleBindingRegistry;
+import org.eclipse.edc.policy.model.Duty;
 import org.eclipse.edc.policy.model.Permission;
 import org.eclipse.edc.policy.model.Prohibition;
 import org.eclipse.edc.spi.monitor.Monitor;
@@ -226,5 +227,49 @@ class PolicyEvaluationExtensionTest {
                 eq(PolicyConstants.MEMBERSHIP_STATUS_CONSTRAINT_KEY), any());
         verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(TransferProcessPolicyContext.class), eq(Prohibition.class),
                 eq(PolicyConstants.ORGANIZATION_ROLES_CONSTRAINT_KEY), any());
+    }
+
+    // ── Duty (obligation) scope bindings ──────────────────────────────────────
+
+    @Test
+    void initialize_registersDutyFunctionsForNegotiationContext() {
+        extension.initialize(context);
+        verify(policyEngine, atLeastOnce()).registerFunction(eq(ContractNegotiationPolicyContext.class), eq(Duty.class),
+                eq(PolicyConstants.DAC_APPROVAL_CONSTRAINT_KEY), any());
+        verify(policyEngine, atLeastOnce()).registerFunction(eq(ContractNegotiationPolicyContext.class), eq(Duty.class),
+                eq(PolicyConstants.PERMIT_ISSUED_CONSTRAINT_KEY), any());
+    }
+
+    @Test
+    void initialize_registersDutyFunctionsForTransferContext() {
+        extension.initialize(context);
+        verify(policyEngine, atLeastOnce()).registerFunction(eq(TransferProcessPolicyContext.class), eq(Duty.class),
+                eq(PolicyConstants.DAC_APPROVAL_CONSTRAINT_KEY), any());
+        verify(policyEngine, atLeastOnce()).registerFunction(eq(TransferProcessPolicyContext.class), eq(Duty.class),
+                eq(PolicyConstants.PERMIT_ISSUED_CONSTRAINT_KEY), any());
+    }
+
+    @Test
+    void initialize_bindsDutyConstraintKeysToNegotiationScope() {
+        extension.initialize(context);
+        verify(ruleBindingRegistry, atLeastOnce()).bind(PolicyConstants.DAC_APPROVAL_CONSTRAINT_KEY, NEGOTIATION_SCOPE);
+        verify(ruleBindingRegistry, atLeastOnce()).bind(PolicyConstants.PERMIT_ISSUED_CONSTRAINT_KEY, NEGOTIATION_SCOPE);
+    }
+
+    @Test
+    void initialize_bindsDutyConstraintKeysToTransferScope() {
+        extension.initialize(context);
+        verify(ruleBindingRegistry, atLeastOnce()).bind(PolicyConstants.DAC_APPROVAL_CONSTRAINT_KEY, TRANSFER_SCOPE);
+        verify(ruleBindingRegistry, atLeastOnce()).bind(PolicyConstants.PERMIT_ISSUED_CONSTRAINT_KEY, TRANSFER_SCOPE);
+    }
+
+    @Test
+    void initialize_doesNotRegisterDutyFunctionsForCatalogContext() {
+        extension.initialize(context);
+        // Obligation functions are not registered for catalog — catalog is a lightweight visibility gate only
+        verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(CatalogPolicyContext.class), eq(Duty.class),
+                eq(PolicyConstants.DAC_APPROVAL_CONSTRAINT_KEY), any());
+        verify(policyEngine, org.mockito.Mockito.never()).registerFunction(eq(CatalogPolicyContext.class), eq(Duty.class),
+                eq(PolicyConstants.PERMIT_ISSUED_CONSTRAINT_KEY), any());
     }
 }
