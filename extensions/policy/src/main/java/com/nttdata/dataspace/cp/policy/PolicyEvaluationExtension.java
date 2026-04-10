@@ -1,5 +1,9 @@
 package com.nttdata.dataspace.cp.policy;
 
+import com.nttdata.dataspace.cp.policy.obligation.DutyCredentialClaimEvaluationFunction;
+import com.nttdata.dataspace.cp.policy.permission.CredentialClaimEvaluationFunction;
+import com.nttdata.dataspace.cp.policy.prohibition.ProhibitionCredentialClaimEvaluationFunction;
+
 import org.eclipse.edc.connector.controlplane.catalog.spi.policy.CatalogPolicyContext;
 import org.eclipse.edc.connector.controlplane.contract.spi.policy.ContractNegotiationPolicyContext;
 import org.eclipse.edc.connector.controlplane.contract.spi.policy.TransferProcessPolicyContext;

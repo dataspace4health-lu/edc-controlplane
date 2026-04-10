@@ -1,5 +1,7 @@
 package com.nttdata.dataspace.cp.policy;
 
+import com.nttdata.dataspace.cp.policy.permission.CredentialClaimEvaluationFunction;
+
 import org.eclipse.edc.iam.verifiablecredentials.spi.model.CredentialSubject;
 import org.eclipse.edc.iam.verifiablecredentials.spi.model.Issuer;
 import org.eclipse.edc.iam.verifiablecredentials.spi.model.VerifiableCredential;

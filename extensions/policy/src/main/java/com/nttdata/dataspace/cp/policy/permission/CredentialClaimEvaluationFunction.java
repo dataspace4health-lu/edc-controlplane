@@ -1,5 +1,7 @@
-package com.nttdata.dataspace.cp.policy;
+package com.nttdata.dataspace.cp.policy.permission;
 
+import com.nttdata.dataspace.cp.policy.CredentialClaimEvaluator;
+import com.nttdata.dataspace.cp.policy.prohibition.ProhibitionCredentialClaimEvaluationFunction;
 import org.eclipse.edc.participant.spi.ParticipantAgentPolicyContext;
 import org.eclipse.edc.policy.engine.spi.AtomicConstraintRuleFunction;
 import org.eclipse.edc.policy.model.Operator;

@@ -1,5 +1,8 @@
 package com.nttdata.dataspace.cp.policy;
 
+import com.nttdata.dataspace.cp.policy.permission.CredentialClaimEvaluationFunction;
+import com.nttdata.dataspace.cp.policy.prohibition.ProhibitionCredentialClaimEvaluationFunction;
+
 import org.eclipse.edc.iam.verifiablecredentials.spi.model.CredentialSubject;
 import org.eclipse.edc.participant.spi.ParticipantAgentPolicyContext;
 import org.eclipse.edc.policy.model.Operator;
@@ -33,13 +36,13 @@ import java.util.Set;
  *       {@code success(false)} or {@code failure} = prohibition does not apply</li>
  * </ul>
  */
-class CredentialClaimEvaluator extends AbstractCredentialEvaluationFunction {
+public class CredentialClaimEvaluator extends AbstractCredentialEvaluationFunction {
 
     private final String claimName;
     private final Set<String> allowedValues;
     private final Monitor monitor;
 
-    CredentialClaimEvaluator(String claimName, Set<String> allowedValues, Monitor monitor) {
+    public CredentialClaimEvaluator(String claimName, Set<String> allowedValues, Monitor monitor) {
         this.claimName = claimName;
         this.allowedValues = allowedValues == null ? Set.of() : allowedValues;
         this.monitor = monitor;
@@ -54,7 +57,7 @@ class CredentialClaimEvaluator extends AbstractCredentialEvaluationFunction {
      * @return {@link Result#failure} on validation/extraction errors;
      *         {@code success(true)} if condition is met; {@code success(false)} otherwise
      */
-    Result<Boolean> evaluate(Operator operator, Object rightOperand, ParticipantAgentPolicyContext policyContext) {
+    public Result<Boolean> evaluate(Operator operator, Object rightOperand, ParticipantAgentPolicyContext policyContext) {
         monitor.debug("CredentialClaim '%s' evaluation started: operator=%s, rightOperand=%s"
                 .formatted(claimName, operator, rightOperand));
 
