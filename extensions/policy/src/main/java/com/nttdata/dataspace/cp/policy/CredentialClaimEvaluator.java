@@ -72,7 +72,7 @@ public class CredentialClaimEvaluator extends AbstractCredentialEvaluationFuncti
             return Result.failure("Constraint '%s': rightOperand must not be null".formatted(claimName));
         }
 
-        var requiredValue = rightOperand.toString();
+        var requiredValue = normalizeRightOperand(rightOperand);
 
         // ── Step 3: validate rightOperand is a recognized value ───────────────
         // Skipped for free-form fields (allowedValues empty, e.g. jurisdictionCountry)
@@ -107,6 +107,16 @@ public class CredentialClaimEvaluator extends AbstractCredentialEvaluationFuncti
                 .anyMatch(cs -> claimSatisfied(cs, requiredValue, operator));
 
         return Result.success(conditionMet);
+    }
+
+    private String normalizeRightOperand(Object rightOperand) {
+        var stringValue = rightOperand.toString();
+        var normalizedValue = stringValue.trim();
+        if (!normalizedValue.equals(stringValue)) {
+            monitor.debug("CredentialClaim '%s': normalized rightOperand from '%s' to '%s'"
+                    .formatted(claimName, stringValue, normalizedValue));
+        }
+        return normalizedValue;
     }
 
     /**

@@ -277,6 +277,23 @@ class DutyCredentialClaimEvaluationFunctionTest {
         assertThat(result).isTrue();
     }
 
+        @Test
+        void evaluate_permitIssuedClaim_trailingWhitespaceInRightOperand_returnsTrue() {
+                var permitFunction = DutyCredentialClaimEvaluationFunction
+                                .<ParticipantAgentPolicyContext>create(
+                                                PolicyConstants.PERMIT_ISSUED_CLAIM,
+                                                PolicyConstants.VALID_BOOLEAN_VALUES,
+                                                monitor);
+
+                var agent = buildAgentWithScalarClaim(PolicyConstants.PERMIT_ISSUED_CLAIM, "true");
+                when(policyContext.participantAgent()).thenReturn(agent);
+
+                var result = permitFunction.evaluate(Operator.EQ, new StringBuilder("true "),
+                                Duty.Builder.newInstance().build(), policyContext);
+
+                assertThat(result).isTrue();
+        }
+
     @Test
     void evaluate_permitIssuedClaim_conditionNotMet_returnsFalse() {
         var permitFunction = DutyCredentialClaimEvaluationFunction
