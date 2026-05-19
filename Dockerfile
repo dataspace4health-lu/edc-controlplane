@@ -21,7 +21,7 @@ RUN ./gradlew shadowJar --no-daemon -x test
 
 
 # ---- Runtime stage ----
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
 # Set default log level (can be overridden at runtime)
@@ -43,7 +43,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gpgconf \
     gpgsm \
     gpgv \
-    keyboxd \
     && rm -rf /var/lib/apt/lists/* \
     && addgroup --system "$APP_USER" \
     && adduser \  
@@ -62,7 +61,7 @@ COPY --from=builder /workspace/build/libs/*.jar /app/controlplane.jar
 RUN chown -R "$APP_USER":"$APP_USER" /app
 
 # Drop privileges: run as non-root
-USER "$APP_USER"
+USER ${APP_UID}
 
 # Run the jar with logging
 CMD ["sh", "-c", "exec java -jar /app/controlplane.jar --log-level=$LOG_LEVEL"]
