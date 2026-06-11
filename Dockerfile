@@ -28,10 +28,12 @@ WORKDIR /app
 ENV LOG_LEVEL=info
 
 # Create a non-root user to run the application
-ARG APP_USER=appuser  
+ARG APP_USER=appuser
 ARG APP_UID=10100
 
-# Install helper tools, upgrade GnuPG packages for CVE-2025-68973, and create user
+# Install helper tools, upgrade GnuPG packages for CVE-2025-68973,
+# upgrade OpenSSL packages for CVE-2026-45447 (use-after-free in PKCS#7 verification),
+# and create non-root user
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl jq \
     && apt-get upgrade -y \
@@ -43,15 +45,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gpgconf \
     gpgsm \
     gpgv \
+    libssl3 \
+    openssl \
     && rm -rf /var/lib/apt/lists/* \
     && addgroup --system "$APP_USER" \
-    && adduser \  
-    --shell /sbin/nologin \  
-    --disabled-password \  
-    --gecos "" \  
-    --ingroup "$APP_USER" \  
-    --no-create-home \  
-    --uid "$APP_UID" \  
+    && adduser \
+    --shell /sbin/nologin \
+    --disabled-password \
+    --gecos "" \
+    --ingroup "$APP_USER" \
+    --no-create-home \
+    --uid "$APP_UID" \
     "$APP_USER"
 
 # Copy only the fat jar and configs from builder
