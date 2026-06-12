@@ -96,6 +96,7 @@ dependencies {
 
     implementation(project(":extensions:scope"))
     implementation(project(":extensions:policy"))
+    implementation(project(":extensions:s3"))
     implementation(project(":extensions:common:http:client"))
     implementation(project(":extensions:common:decentralized-claims-issuers-configuration"))
     

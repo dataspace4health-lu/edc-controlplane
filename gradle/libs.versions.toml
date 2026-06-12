@@ -118,6 +118,7 @@ edc-vault-hashicorp = { module = "org.eclipse.edc:vault-hashicorp", version.ref 
 edc-vault-hashicorp-spi = { module = "org.eclipse.edc:vault-hashicorp-spi", version.ref = "edc" }
 edc-vault-filesystem = { module = "org.eclipse.edc:vault-filesystem", version.ref = "edc-vault" }
 edc-validator-data-address-http-data = { module = "org.eclipse.edc:validator-data-address-http-data", version.ref = "edc" }
+edc-validator-spi = { module = "org.eclipse.edc:validator-spi", version.ref = "edc" }
 edc-web-spi = { module = "org.eclipse.edc:web-spi", version.ref = "edc" }
 
 
