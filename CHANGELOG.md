@@ -8,6 +8,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 ## [Unreleased]
 
+### Security
+- Pinned `com.fasterxml.jackson.core:jackson-databind` to `2.21.4` — fixes CVE-2026-54512 (HIGH): `PolymorphicTypeValidator` allow-list bypassed via generic type parameters in the type ID (e.g. `ArrayList<EvilClass>` passes PTV check for `ArrayList`; nested type arguments are never validated). Affects 2.10.0–2.21.3; fixed in 2.18.8, **2.21.4**, 3.1.4.
+- Pinned `com.fasterxml.jackson.core:jackson-databind` to `2.21.4` — fixes CVE-2026-54513 (HIGH): `BasicPolymorphicTypeValidator.Builder.allowIfSubTypeIsArray()` allowlists any array type based solely on `clazz.isArray()` without validating the component type, allowing `EvilType[]` to bypass an explicit allow-list. Affects 2.10.0–2.21.3; fixed in 2.18.8, **2.21.4**, 3.1.4.
+
 ---
 
 ## [0.15.1] — 2026-06-15

@@ -8,13 +8,13 @@ The `edc-controlplane` repository is a **stable, production-targeted runtime**. 
 
 1. **EDC version upgrade tracking** — the local `TrustedIssuerConfigurationExtension` is a compatibility shim for EDC 0.15.1. When upgrading beyond this version, verify the upstream fix is included and remove the local extension.
 2. **Policy constraint additions** — new dataspace attribute requirements are added by extending `PolicyConstants` and registering in `PolicyEvaluationExtension`.
-3. **CVE patch cadence** — pinned versions for `jackson-core` (GHSA-72hv-8253-57qq) and Jetty (CVE-2026-1605, CVE-2026-2332) must be re-evaluated on each EDC BOM upgrade.
+3. **CVE patch cadence** — pinned versions for `jackson-core` (GHSA-72hv-8253-57qq), `jackson-databind` (CVE-2026-54512, CVE-2026-54513), and Jetty (CVE-2026-1605, CVE-2026-2332) must be re-evaluated on each EDC BOM upgrade.
 
 ## Recent Changes
 
 - Added `extensions/s3` module with `S3DataAddressValidatorExtension` for AmazonS3 source/destination validation.
 - Added `extensions/common/http/client` with `HttpClientExtension` supporting TLS bypass via `edc.http.disable.tls`.
-- Pinned `jackson-core` to `2.21.1` and Jetty to `12.1.7` in `build.gradle.kts` resolution strategy.
+- Pinned `jackson-core` to `2.21.1`, `jackson-databind` to `2.21.4`, and Jetty to `12.1.7` in `build.gradle.kts` resolution strategy.
 - Added GnuPG and OpenSSL upgrades in `Dockerfile` runtime stage.
 - Added obligation (duty) constraint support: `dacApproval` and `permitIssued` bound to negotiation and transfer scopes.
 - Added prohibition constraint support: `euEeaStatus` and `organizationOwnershipType` bound to negotiation and transfer scopes.
@@ -24,7 +24,7 @@ The `edc-controlplane` repository is a **stable, production-targeted runtime**. 
 - [ ] Upgrade to EDC > 0.15.1 and remove `decentralized-claims-issuers-configuration` local extension when upstream fix is confirmed.
 - [ ] Add integration tests that exercise the full policy evaluation path end-to-end with a real IdentityHub.
 - [ ] Evaluate adding `jurisdictionCountry` NEQ prohibition support if needed by new policy requirements.
-- [ ] Review Jetty and jackson-core pins on next EDC BOM upgrade.
+- [ ] Review Jetty, jackson-core, and jackson-databind pins on next EDC BOM upgrade.
 
 ## Active Decisions and Considerations
 

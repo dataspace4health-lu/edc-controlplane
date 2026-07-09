@@ -20,11 +20,18 @@ allprojects {
         }
     }
 
-    // Pin jackson-core (only) to 2.21.1 to fix GHSA-72hv-8253-57qq (Number Length Constraint
+    // Pin jackson-core to 2.21.1 to fix GHSA-72hv-8253-57qq (Number Length Constraint
     // Bypass in Async Parser, published 2026-02-26). EDC BOM 0.15.1 resolves 2.20.1 which is
     // in the affected range 2.19.0-2.21.0; patched version is 2.21.1.
-    // NOTE: only jackson-core received the 2.21.1 security patch — jackson-annotations and
-    // jackson-databind have no 2.21.1 release and must remain at their BOM-resolved versions.
+    //
+    // Pin jackson-databind to 2.21.4 to fix two HIGH CVEs:
+    //   CVE-2026-54512: PolymorphicTypeValidator (PTV) allow-list bypassed via generic type
+    //     parameters in the type ID (e.g. ArrayList<EvilClass> passes PTV check for ArrayList).
+    //     Affects 2.10.0-2.21.3; fixed in 2.18.8, 2.21.4, 3.1.4.
+    //   CVE-2026-54513: BasicPolymorphicTypeValidator.Builder.allowIfSubTypeIsArray() allowlists
+    //     any array type based solely on clazz.isArray() without validating the component type,
+    //     allowing EvilType[] to bypass an explicit allow-list.
+    //     Affects 2.10.0-2.21.3; fixed in 2.18.8, 2.21.4, 3.1.4.
     //
     // Pin Eclipse Jetty to 12.1.7 to fix multiple Jetty CVEs, including CVE-2026-1605
     // (GzipHandler JDK Inflater resource leak) and CVE-2026-2332 (HTTP/1.1 request
@@ -35,6 +42,10 @@ allprojects {
             if (requested.group == "com.fasterxml.jackson.core" && requested.name == "jackson-core") {
                 useVersion("2.21.1")
                 because("GHSA-72hv-8253-57qq: pin jackson-core to 2.21.1 (patched)")
+            }
+            if (requested.group == "com.fasterxml.jackson.core" && requested.name == "jackson-databind") {
+                useVersion("2.21.4")
+                because("CVE-2026-54512 and CVE-2026-54513: pin jackson-databind to 2.21.4 (patched)")
             }
             if (requested.group.startsWith("org.eclipse.jetty")) {
                 useVersion("12.1.7")

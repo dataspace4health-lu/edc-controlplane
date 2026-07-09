@@ -22,11 +22,17 @@ Module: `extensions/policy`
 What it does:
 
 - registers policy functions in the EDC `PolicyEngine`
-- evaluates permission, prohibition, and duty constraints against claims in the participant's Verifiable Credentials
+- evaluates **permission**, **prohibition**, and **duty (obligation)** constraints against claims in the participant's Verifiable Credentials
 - binds different checks to the right policy scope:
     - catalog request time
     - contract negotiation time
     - transfer start time
+
+Constraint types registered:
+
+- **Permission constraints** — `membershipStatus`, `euEeaStatus`, `organizationType`, `organizationOwnershipType`, `organizationRoles`, `dataProtectionRole`, `jurisdictionCountry`, `supportedProtocols`
+- **Prohibition constraints** — `euEeaStatus`, `organizationOwnershipType` (bound to negotiation and transfer scopes)
+- **Duty (obligation) constraints** — `dacApproval`, `permitIssued` (bound to negotiation and transfer scopes)
 
 When it is used:
 
@@ -89,6 +95,21 @@ When it is used:
 
 - whenever runtime components request the provided HTTP client through dependency injection
 - especially for outbound HTTP calls to external services used by the control plane
+
+### S3 validator extension
+
+Module: `extensions/s3`
+
+What it does:
+
+- registers `DataAddress` validators for the `AmazonS3` type at the control-plane level
+- validates that source `DataAddress` entries contain `bucketName`, `region`, and at least one of `objectName`, `folderName`, or `objectPrefix`
+- validates that destination `DataAddress` entries contain `bucketName`, `region`, and `keyName`
+
+When it is used:
+
+- at contract definition and asset registration time, when the control plane validates incoming `DataAddress` fields before accepting the asset
+- ensures malformed or incomplete S3 addresses are rejected early, before any transfer is attempted
 
 ## How The Repo Is Used At Runtime
 

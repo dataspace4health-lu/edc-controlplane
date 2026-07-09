@@ -39,6 +39,7 @@
 
 ### Security Patches Applied
 - `jackson-core` pinned to `2.21.1` (GHSA-72hv-8253-57qq)
+- `jackson-databind` pinned to `2.21.4` (CVE-2026-54512, CVE-2026-54513 — polymorphic type validator PTV allow-list bypasses, both HIGH)
 - Jetty pinned to `12.1.7` (CVE-2026-1605, CVE-2026-2332)
 - GnuPG and OpenSSL upgraded in Dockerfile (CVE-2025-68973, CVE-2026-45447)
 
