@@ -31,22 +31,14 @@ ENV LOG_LEVEL=info
 ARG APP_USER=appuser
 ARG APP_UID=10100
 
-# Install helper tools, upgrade GnuPG packages for CVE-2025-68973,
-# upgrade OpenSSL packages for CVE-2026-45447 (use-after-free in PKCS#7 verification),
-# and create non-root user
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl jq \
+# Upgrade all base-image packages first so every fixable OS-level CVE
+# (including CVE-2025-68973, CVE-2026-45447, and any future advisories) is
+# patched without requiring manual package-list maintenance, then install
+# helper tools, and create non-root user.
+RUN apt-get update \
     && apt-get upgrade -y \
-    dirmngr \
-    gnupg \
-    gnupg-utils \
-    gpg \
-    gpg-agent \
-    gpgconf \
-    gpgsm \
-    gpgv \
-    libssl3 \
-    openssl \
+    && apt-get install -y --no-install-recommends \
+    curl jq \
     && rm -rf /var/lib/apt/lists/* \
     && addgroup --system "$APP_USER" \
     && adduser \

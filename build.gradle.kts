@@ -20,9 +20,12 @@ allprojects {
         }
     }
 
-    // Pin jackson-core to 2.21.1 to fix GHSA-72hv-8253-57qq (Number Length Constraint
-    // Bypass in Async Parser, published 2026-02-26). EDC BOM 0.15.1 resolves 2.20.1 which is
-    // in the affected range 2.19.0-2.21.0; patched version is 2.21.1.
+    // Pin jackson-core to 2.21.4 to fix:
+    //   GHSA-72hv-8253-57qq: Number Length Constraint Bypass in Async Parser
+    //     (published 2026-02-26). EDC BOM 0.15.1 resolves 2.20.1 which is in the
+    //     affected range 2.19.0-2.21.0; patched version is 2.21.1.
+    //   GHSA-r7wm-3cxj-wff9: async parser / ByteArrayFeeder bug (HIGH).
+    //     Affected range includes 2.21.1; fixed in 2.18.8, 2.21.4, 2.22.1.
     //
     // Pin jackson-databind to 2.21.4 to fix two HIGH CVEs:
     //   CVE-2026-54512: PolymorphicTypeValidator (PTV) allow-list bypassed via generic type
@@ -33,23 +36,25 @@ allprojects {
     //     allowing EvilType[] to bypass an explicit allow-list.
     //     Affects 2.10.0-2.21.3; fixed in 2.18.8, 2.21.4, 3.1.4.
     //
-    // Pin Eclipse Jetty to 12.1.7 to fix multiple Jetty CVEs, including CVE-2026-1605
-    // (GzipHandler JDK Inflater resource leak) and CVE-2026-2332 (HTTP/1.1 request
-    // smuggling via malformed chunk extensions). EDC BOM 0.15.1 resolves an older Jetty
-    // line, so force the patched 12.1.7 release for all Jetty modules.
+    // Pin Eclipse Jetty to 12.1.10 to fix multiple Jetty CVEs:
+    //   CVE-2026-1605: GzipHandler JDK Inflater resource leak.
+    //   CVE-2026-2332: HTTP/1.1 request smuggling via malformed chunk extensions.
+    //   CVE-2026-10050: jetty-security HIGH vulnerability; fixed in 12.1.10.
+    // EDC BOM 0.15.1 resolves an older Jetty line, so force the patched 12.1.10
+    // release for all Jetty modules.
     configurations.configureEach {
         resolutionStrategy.eachDependency {
             if (requested.group == "com.fasterxml.jackson.core" && requested.name == "jackson-core") {
-                useVersion("2.21.1")
-                because("GHSA-72hv-8253-57qq: pin jackson-core to 2.21.1 (patched)")
+                useVersion("2.21.4")
+                because("GHSA-72hv-8253-57qq and GHSA-r7wm-3cxj-wff9: pin jackson-core to 2.21.4 (patched)")
             }
             if (requested.group == "com.fasterxml.jackson.core" && requested.name == "jackson-databind") {
                 useVersion("2.21.4")
                 because("CVE-2026-54512 and CVE-2026-54513: pin jackson-databind to 2.21.4 (patched)")
             }
             if (requested.group.startsWith("org.eclipse.jetty")) {
-                useVersion("12.1.7")
-                because("CVE-2026-1605 and CVE-2026-2332: pin Jetty to 12.1.7 (patched)")
+                useVersion("12.1.10")
+                because("CVE-2026-1605, CVE-2026-2332 and CVE-2026-10050: pin Jetty to 12.1.10 (patched)")
             }
         }
     }
@@ -110,6 +115,7 @@ dependencies {
     implementation(project(":extensions:s3"))
     implementation(project(":extensions:common:http:client"))
     implementation(project(":extensions:common:decentralized-claims-issuers-configuration"))
+    implementation(project(":extensions:clearing-house"))
     
 }
 
