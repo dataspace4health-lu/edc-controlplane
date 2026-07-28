@@ -115,6 +115,11 @@ dependencies {
     implementation(project(":extensions:s3"))
     implementation(project(":extensions:common:http:client"))
     implementation(project(":extensions:common:decentralized-claims-issuers-configuration"))
+    implementation(project(":extensions:legal-contracting"))
+
+    // PDFBox — required because the root sourceSets walkTopDown includes
+    // extensions/legal-contracting/src/main/java directly in :compileJava
+    implementation(libs.apache.pdfbox)
     implementation(project(":extensions:clearing-house"))
     
 }

@@ -96,6 +96,35 @@ When it is used:
 - whenever runtime components request the provided HTTP client through dependency injection
 - especially for outbound HTTP calls to external services used by the control plane
 
+### Legal Contracting Extension
+
+Module: `extensions/legal-contracting`
+
+What it does:
+
+- generates human-readable PDF evidence documents for finalized EDC contract agreements
+- renders ODRL policies in human-friendly format (e.g., "Membership Status = active" instead of technical constraint objects)
+- embeds DATASPACE4HEALTH branding and logos
+- stores PDFs in filesystem cache for fast retrieval
+- provides REST API endpoints to download contract PDFs or check PDF availability
+
+Key features:
+
+- **On-demand PDF generation** — PDFs generated only when requested, not on every contract finalization
+- **ODRL rendering** — Converts complex nested constraints (AndConstraint, OrConstraint) to readable format
+- **Logo branding** — Embeds organization logo in top-right corner of page 1
+- **7-section structure** — Includes agreement ID, parties, dataset schedule, permissions, prohibitions, obligations, and technical annex with hashes
+
+Test coverage: **89%** (1110/1242 lines) with comprehensive unit tests for all core components.
+
+When it is used:
+
+- automatically triggered when a contract negotiation is finalized
+- on-demand PDF generation when `/legal-contract/{agreementId}` endpoint is called
+- PDF availability checks via `/legal-contract/{agreementId}/status` endpoint
+
+For detailed architecture and design information, see [`extensions/legal-contracting/ARCHITECTURE.md`](extensions/legal-contracting/ARCHITECTURE.md) and [`extensions/legal-contracting/README.md`](extensions/legal-contracting/README.md).
+
 ### S3 validator extension
 
 Module: `extensions/s3`
