@@ -194,6 +194,18 @@ class PdfPageWriterTest {
         assertThatCode(() -> writer.renderLines(lines)).doesNotThrowAnyException();
     }
 
+    @Test
+    void renderLines_multipleSpaces_handledWithoutNullPointer() throws IOException {
+        // Multiple consecutive spaces produce empty-string tokens when split by " ".
+        // The null-guard in wrapText() must handle these gracefully.
+        List<ContentLine> lines = List.of(
+                ContentLine.body("word1  word2   word3"),   // double/triple spaces
+                ContentLine.body("  leading spaces"),        // leading spaces
+                ContentLine.body("trailing spaces  ")        // trailing spaces
+        );
+        assertThatCode(() -> writer.renderLines(lines)).doesNotThrowAnyException();
+    }
+
     // ── Monospace text ────────────────────────────────────────────────────────
 
     @Test

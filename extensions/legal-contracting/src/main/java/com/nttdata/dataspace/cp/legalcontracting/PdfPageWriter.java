@@ -273,9 +273,14 @@ public class PdfPageWriter {
         for (String paragraph : text.split("\n", -1)) {
             String[] words = paragraph.split(" ");
             StringBuilder current = new StringBuilder();
-            for (String word : words) {
-                String candidate = current.length() == 0 ? word : current + " " + word;
-                float w = 0;
+            for (String token : words) {
+                // Guard against null tokens — String.split() won't produce nulls in practice,
+                // but static analysis requires an explicit check to rule out NPE.
+                if (token == null) {
+                    continue;
+                }
+                String candidate = current.length() == 0 ? token : current + " " + token;
+                float w;
                 try {
                     w = font.getStringWidth(sanitise(candidate)) / 1000 * fontSize;
                 } catch (Exception e) {
@@ -283,7 +288,7 @@ public class PdfPageWriter {
                 }
                 if (w > maxWidth && current.length() > 0) {
                     result.add(current.toString());
-                    current = new StringBuilder(word);
+                    current = new StringBuilder(token);
                 } else {
                     current = new StringBuilder(candidate);
                 }
