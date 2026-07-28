@@ -8,6 +8,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 ## [Unreleased]
 
+### Added
+- `extensions/legal-contracting` — `LegalContractingExtension` generates a PDF legal contract whenever a contract negotiation reaches the FINALIZED state and exposes it via the Management API.
+  - `LegalContractApiController` registers on the `"management"` web context (port 9192):
+    - `GET /management/v3/legal-contract/{agreementId}` — downloads the PDF (`application/pdf`); returns `404` if not yet generated.
+    - `GET /management/v3/legal-contract/{agreementId}/status` — returns `{"agreementId":"…","pdfAvailable":true|false}` without downloading the document.
+  - `ContractNegotiationListenerImpl` hooks into `ContractNegotiationObservable`; fires on both PROVIDER and CONSUMER sides so each participant independently stores its own copy.
+  - `ContractDocumentGenerator` orchestrates PDF production via a two-pass SHA-256 integrity scheme: the first-pass PDF is hashed and the digest is embedded into the final second-pass document, making the file self-certifying.
+  - `ContractContentBuilder` assembles the 8-section content model (Agreement Identification, Parties, Dataset Schedule, Permissions, Prohibitions, Obligations, Legal Clauses, Technical Annex including full ODRL JSON-LD).
+  - `PdfPageWriter` renders the content model to a paginated A4 PDF using Apache PDFBox with automatic page breaks, bold/regular field layout, and monospaced ODRL JSON blocks.
+  - `FilesystemContractDocumentStore` persists PDFs as `<storageDir>/<sanitizedAgreementId>.pdf`; agreement IDs are sanitized to prevent path traversal.
+  - PDF generation failures are logged as SEVERE and swallowed — they never propagate into the EDC state machine.
+  - Configurable via `edc.legal.contract.storage.dir` (default: `/tmp/legal-contracts`).
+
 ### Security
 - Pinned `com.fasterxml.jackson.core:jackson-core` to `2.21.4` — fixes GHSA-r7wm-3cxj-wff9 (HIGH). Affects versions prior to 2.18.8 / 2.21.4 / 2.22.1; previously pinned to 2.21.1 which remained in the affected range.
 - Pinned `org.eclipse.jetty:*` to `12.1.10` — fixes CVE-2026-10050 (HIGH). Previously pinned to 12.1.7 which is in the affected range; fixed in 9.4.63, 10.0.31, 11.0.31, 12.0.36, **12.1.10**.

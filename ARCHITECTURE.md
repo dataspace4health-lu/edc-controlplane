@@ -33,6 +33,8 @@ The runtime is a single JVM process. All extensions are loaded at startup throug
 │  │  │  • TrustedIssuerConfigurationExtension             │    │  │
 │  │  │  • HttpClientExtension (extensions/common/http)    │    │  │
 │  │  │  • S3DataAddressValidatorExtension (extensions/s3) │    │  │
+│  │  │  • LegalContractingExtension (extensions/          │    │  │
+│  │  │      legal-contracting)                            │    │  │
 │  │  └─────────────────────────────────────────────────────┘    │  │
 │  └──────────────────────────────────────────────────────────────┘  │
 └────────────────────────────────────────────────────────────────────┘
@@ -141,6 +143,74 @@ Each alias is an arbitrary label used to partition the config. Multiple issuers 
 **Purpose**: Provides the shared `OkHttpClient` instance used by EDC runtime components for all outbound HTTP calls.
 
 **Key decision**: Marked with `@Provider` so EDC's dependency injection system selects this instance over any default. The optional TLS bypass (`edc.http.disable.tls=true`) creates a client that trusts all certificates and skips hostname verification — intended exclusively for test clusters where internal services use self-signed certificates.
+
+---
+
+### Legal Contracting Extension (`extensions/legal-contracting`)
+
+**Purpose**: Automatically generates a signed PDF legal contract whenever a contract negotiation reaches the FINALIZED state, and exposes the stored PDF via a Management API endpoint.
+
+**Design**:
+```
+LegalContractingExtension.initialize()
+  ├── reads edc.legal.contract.storage.dir
+  │     → FilesystemContractDocumentStore(storageDir)
+  ├── ContractDocumentGenerator(AssetService, ObjectMapper, Monitor, store)
+  ├── ContractNegotiationObservable.registerListener(ContractNegotiationListenerImpl)
+  └── WebService.registerResource("management", LegalContractApiController(store))
+
+ContractNegotiationListenerImpl implements ContractNegotiationListener
+  └── finalized(negotiation)
+        └── ContractDocumentGenerator.generateAndStore(negotiation)
+              ├── loads Asset via AssetService
+              ├── ContractContentBuilder.build(...)   → List<ContentLine>
+              ├── PdfPageWriter.renderLines(lines)    → PDDocument (pass 1)
+              ├── sha256(pass-1 bytes)                → docHash
+              ├── PdfPageWriter.renderLines(lines)    → PDDocument (pass 2, real hash)
+              └── FilesystemContractDocumentStore.store(agreementId, pdfBytes)
+
+LegalContractApiController  (JAX-RS, /v3/legal-contract)
+  ├── GET /{agreementId}        → 200 application/pdf | 404
+  └── GET /{agreementId}/status → 200 application/json {"agreementId":…,"pdfAvailable":…}
+```
+
+**PDF generation pipeline**:
+1. `ContractNegotiationListenerImpl.finalized()` fires on **both** PROVIDER and CONSUMER sides when a negotiation reaches FINALIZED state. Both sides independently generate and persist their own copy of the PDF.
+2. `ContractDocumentGenerator` loads the associated `Asset` via `AssetService`, serializes the ODRL policy to pretty-printed JSON, and computes a SHA-256 hash of the policy bytes.
+3. `ContractContentBuilder` assembles an ordered list of `ContentLine` objects representing the 8-section document model. No I/O occurs here; this class is a pure content mapper.
+4. `PdfPageWriter` paginates the `ContentLine` list into an A4 `PDDocument` using Apache PDFBox. Handles automatic page breaks, bold/regular field rendering, horizontal separator rules, and monospaced code blocks for the ODRL JSON annex.
+5. **Two-pass hash embedding**: the document is rendered twice. The first-pass PDF bytes are SHA-256 hashed to obtain the `docHash`, which is then embedded into the second (final) pass. This makes the document self-certifying without requiring an external signature infrastructure.
+6. The final PDF bytes are persisted by `FilesystemContractDocumentStore` as `<storageDir>/<sanitizedAgreementId>.pdf`.
+
+**PDF document structure**:
+
+| Section | Key content |
+|---|---|
+| 1. Agreement Identification | Agreement ID, signing date, negotiation ID/timestamp, type, DSP protocol, provider/consumer DIDs |
+| 2. Parties | Provider and consumer DIDs; counterparty DSP address; DCP identity verification statement |
+| 3. Dataset Schedule | Asset ID; HealthDCAT-AP properties (title, publisher, description, format, classification, version, checksum); additional custom properties |
+| 4. Permissions | ODRL permissions: actions, atomic/multiplicity constraints |
+| 5. Prohibitions | ODRL prohibitions |
+| 6. Obligations | ODRL duties (including pre-condition duties and consequences) |
+| 7. Legal Clauses | Placeholder — reserved for binding legal terms (pending legal working group) |
+| 8. Technical Annex | Summary fields; document generation timestamp; SHA-256 document hash (self-referential); SHA-256 policy hash; full ODRL policy as JSON-LD |
+
+**Error handling**: PDF generation failures are caught by `ContractNegotiationListenerImpl`, logged as SEVERE, but **not** re-thrown. This guarantees that a PDF failure never propagates into the EDC state machine or blocks the data-sharing flow.
+
+**Storage**: `FilesystemContractDocumentStore` sanitizes agreement IDs (replacing non-alphanumeric/dash/dot/underscore characters with `_`) to prevent path traversal attacks. The storage directory is created lazily on first write.
+
+**Configuration**:
+
+| Property | Default | Description |
+|---|---|---|
+| `edc.legal.contract.storage.dir` | `/tmp/legal-contracts` | Directory where generated PDF files are stored |
+
+**Injected services**:
+- `Monitor` — EDC logging
+- `ContractNegotiationObservable` — EDC contract negotiation event bus
+- `AssetService` — resolves asset metadata for the Dataset Schedule section
+- `WebService` — registers the JAX-RS controller on the management context
+- `TypeManager` — provides the `ObjectMapper` used to serialize the ODRL policy
 
 ---
 

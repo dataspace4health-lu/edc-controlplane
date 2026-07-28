@@ -1,38 +1,49 @@
 # EDC Control Plane
 
-This repo packages a custom EDC control plane runtime plus a small set of extensions that adapt request-scope handling, credential-based policy evaluation, trusted issuer registration, and HTTP client behavior.
+Custom Eclipse Dataspace Connector (EDC) control plane runtime for the **Dataspace4Health (DS4H)** project, developed and maintained by NTT Data.
 
-## What This Repo Provides
+This repo packages the standard EDC control plane with a set of local extensions that adapt it to DS4H's trust, identity, and policy requirements — enabling credential-based access control, scope enrichment, and S3 data address validation.
 
-The application boots the standard EDC runtime through `org.eclipse.edc.boot.system.runtime.BaseRuntime` and adds local extensions from `extensions/**`.
+## Documentation
 
-The main technical functions are:
+| Document | Description |
+|---|---|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture, extension design, and data flows |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Deployment instructions, environment variables, and Helm configuration |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Development setup, coding standards, and contribution guidelines |
+| [CHANGELOG.md](CHANGELOG.md) | Version history and release notes |
+| [SECURITY.md](SECURITY.md) | Security policies and vulnerability reporting |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and debugging guidance |
+| [INFRASTRUCTURE.md](INFRASTRUCTURE.md) | Helm and Kubernetes infrastructure reference |
 
-- credential-based policy evaluation for catalog, contract negotiation, and transfer processing
-- request-scope enrichment for catalog, contract negotiation, and transfer requests
-- startup registration of trusted decentralized credential issuers from configuration
-- a configurable shared OkHttp client with optional TLS verification bypass for non-production environments
+## Overview
 
-## Runtime Extensions
+The control plane is the coordination layer of each DS4H participant connector. It handles:
 
-### Policy extension
+- **Policy evaluation** — evaluates ODRL policy constraints against Verifiable Credentials presented by counterpart connectors
+- **Scope enrichment** — injects default credential scopes into catalog, negotiation, and transfer requests
+- **Contract negotiation** — drives the DSPACE contract negotiation protocol with counterparties
+- **Transfer coordination** — manages transfer process state and delegates execution to the data plane
+- **Asset and catalog management** — stores participant assets, policies, and contract definitions
 
-Module: `extensions/policy`
+## Custom Extensions
 
-What it does:
+| Extension | Module | Description |
+|---|---|---|
+| `PolicyEvaluationExtension` | `extensions/policy` | Registers ODRL constraint functions that evaluate VC claims for catalog, negotiation, and transfer scopes |
+| `ScopeExtension` | `extensions/scope` | Injects configured default scopes into outgoing requests |
+| `TrustedIssuerConfigurationExtension` | `extensions/common/decentralized-claims-issuers-configuration` | Registers trusted VC issuers from configuration at startup |
+| `HttpClientExtension` | `extensions/common/http/client` | Provides shared OkHttpClient with optional TLS bypass for non-production environments |
+| `S3DataAddressValidatorExtension` | `extensions/s3` | Validates AmazonS3 DataAddress fields before a transfer is accepted |
+| `LegalContractingExtension` | `extensions/legal-contracting` | Generates a signed PDF legal contract on negotiation finalization and exposes it via the Management API |
 
-- registers policy functions in the EDC `PolicyEngine`
-- evaluates **permission**, **prohibition**, and **duty (obligation)** constraints against claims in the participant's Verifiable Credentials
-- binds different checks to the right policy scope:
-    - catalog request time
-    - contract negotiation time
-    - transfer start time
+## Quick Start
 
-Constraint types registered:
+### Prerequisites
 
-- **Permission constraints** — `membershipStatus`, `euEeaStatus`, `organizationType`, `organizationOwnershipType`, `organizationRoles`, `dataProtectionRole`, `jurisdictionCountry`, `supportedProtocols`
-- **Prohibition constraints** — `euEeaStatus`, `organizationOwnershipType` (bound to negotiation and transfer scopes)
-- **Duty (obligation) constraints** — `dacApproval`, `permitIssued` (bound to negotiation and transfer scopes)
+- Java 17
+- Gradle 8.x (or use the included `./gradlew` wrapper)
+- Docker
 
 When it is used:
 
@@ -152,8 +163,47 @@ When it is used:
 Build and push the image from the repo root:
 
 ```bash
+# Build fat JAR
+./gradlew shadowJar
+
+# Build and push Docker image
 docker build -t localhost:5432/edc-controlplane . && docker push localhost:5432/edc-controlplane
+
+# Run tests
+./gradlew test
+
+# Run Checkstyle
+./gradlew checkstyleMain
 ```
+
+### Minimum required environment variables
+
+```bash
+EDC_PARTICIPANT_ID=did:web:your-participant.dataspace4health.local
+EDC_DSP_CALLBACK_ADDRESS=https://your-participant.dataspace4health.local/edc/cp/dsp/api
+EDC_IAM_STS_OAUTH_TOKEN_URL=http://edc-identityhub:8185/edc/ih/sts/api/token
+EDC_VAULT_HASHICORP_URL=http://vault:8200
+EDC_VAULT_HASHICORP_TOKEN=<vault-token>
+EDC_DATASOURCE_DEFAULT_URL=jdbc:postgresql://localhost:5432/edc_db
+EDC_DATASOURCE_DEFAULT_USER=edc_user
+EDC_DATASOURCE_DEFAULT_PASSWORD=<password>
+```
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the full environment variable reference.
+
+## API Ports
+
+| Port | Purpose |
+|---|---|
+| 8181 | Health check (`/edc/cp/base/api/check/health`) |
+| 9192 | Management API (asset, policy, contract, negotiation, transfer CRUD) |
+| 8092 | DSP API (counterpart protocol endpoint) |
+| 8093 | Control API (internal data plane coordination) |
+| 8194 | Catalog API |
+
+## Kubernetes Deployment
+
+Use the Helm chart at `helm-edc-connector/components/controlplane`. See [DEPLOYMENT.md](DEPLOYMENT.md) and [INFRASTRUCTURE.md](INFRASTRUCTURE.md) for details.
 
 ## Contributing
 
