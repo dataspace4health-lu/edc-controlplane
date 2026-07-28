@@ -47,6 +47,20 @@ public class ClearingHouseService {
     }
 
     /**
+     * Package-private constructor for unit testing — allows injection of a mock
+     * {@link HttpClient} and a synchronous {@link ExecutorService}.
+     */
+    ClearingHouseService(String clearingHouseUrl, String participantId, Monitor monitor,
+                         HttpClient httpClient, ExecutorService executor) {
+        this.clearingHouseUrl = clearingHouseUrl.replaceAll("/$", "");
+        this.participantId = participantId;
+        this.monitor = monitor.withPrefix("ClearingHouseService");
+        this.objectMapper = new ObjectMapper();
+        this.httpClient = httpClient;
+        this.executor = executor;
+    }
+
+    /**
      * Asynchronously posts a negotiation event to the clearing house.
      *
      * @param action        one of NEGOTIATION_REQUESTED, NEGOTIATION_FINALIZED, NEGOTIATION_TERMINATED
