@@ -35,7 +35,7 @@ The control plane is the coordination layer of each DS4H participant connector. 
 | `TrustedIssuerConfigurationExtension` | `extensions/common/decentralized-claims-issuers-configuration` | Registers trusted VC issuers from configuration at startup |
 | `HttpClientExtension` | `extensions/common/http/client` | Provides shared OkHttpClient with optional TLS bypass for non-production environments |
 | `S3DataAddressValidatorExtension` | `extensions/s3` | Validates AmazonS3 DataAddress fields before a transfer is accepted |
-| `LegalContractingExtension` | `extensions/legal-contracting` | Generates a signed PDF legal contract on negotiation finalization and exposes it via the Management API |
+| `LegalContractingExtension` | `extensions/legal-contracting` | (Unreleased) Generates a PDF technical agreement summary when contract negotiation is finalized and exposes it via the Management API. The PDF is not electronically signed and does not contain legal clauses |
 
 ## Quick Start
 
