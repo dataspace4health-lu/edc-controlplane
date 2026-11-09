@@ -14,8 +14,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
     - `GET /management/v3/legal-contract/{agreementId}` — downloads the PDF (`application/pdf`); returns `404` if not yet generated.
     - `GET /management/v3/legal-contract/{agreementId}/status` — returns `{"agreementId":"…","pdfAvailable":true|false}` without downloading the document.
   - `ContractNegotiationListenerImpl` hooks into `ContractNegotiationObservable`; fires on both PROVIDER and CONSUMER sides so each participant independently stores its own copy.
-  - `ContractDocumentGenerator` orchestrates PDF production via a two-pass SHA-256 integrity scheme: the first-pass PDF is hashed and the digest is embedded into the final second-pass document, making the file self-certifying.
-  - `ContractContentBuilder` assembles the 8-section content model (Agreement Identification, Parties, Dataset Schedule, Permissions, Prohibitions, Obligations, Legal Clauses, Technical Annex including full ODRL JSON-LD).
+  - `ContractDocumentGenerator` uses a two-pass PDF generation process. The SHA-256 digest of the first-pass PDF is embedded in the second-pass document as integrity metadata. This does not constitute a cryptographic signature, and the embedded digest is not a hash of the final PDF.
+  - `ContractContentBuilder` assembles a 7-section technical summary: Agreement Identification, Parties, Dataset Schedule, Permissions, Prohibitions, Obligations, and Technical Annex including ODRL policy JSON-LD and document integrity metadata. No Legal Clauses section is generated.
   - `PdfPageWriter` renders the content model to a paginated A4 PDF using Apache PDFBox with automatic page breaks, bold/regular field layout, and monospaced ODRL JSON blocks.
   - `FilesystemContractDocumentStore` persists PDFs as `<storageDir>/<sanitizedAgreementId>.pdf`; agreement IDs are sanitized to prevent path traversal.
   - PDF generation failures are logged as SEVERE and swallowed — they never propagate into the EDC state machine.
