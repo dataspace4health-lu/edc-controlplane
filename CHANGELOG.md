@@ -9,7 +9,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 ## [Unreleased]
 
 ### Added
-- `extensions/legal-contracting` — `LegalContractingExtension` generates a PDF legal contract whenever a contract negotiation reaches the FINALIZED state and exposes it via the Management API.
+- `extensions/legal-contracting` — `LegalContractingExtension` generates a PDF technical agreement summary when contract negotiation reaches the FINALIZED state and exposes it via the Management API. This document is not an electronically signed legal contract.
   - `LegalContractApiController` registers on the `"management"` web context (port 9192):
     - `GET /management/v3/legal-contract/{agreementId}` — downloads the PDF (`application/pdf`); returns `404` if not yet generated.
     - `GET /management/v3/legal-contract/{agreementId}/status` — returns `{"agreementId":"…","pdfAvailable":true|false}` without downloading the document.
